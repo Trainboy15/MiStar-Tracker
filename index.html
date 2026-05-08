@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=a99cf8" type="image/x-icon">
+<title>MiStar Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --bg2: #161618;
+  --bg3: #1e1e21;
+  --bg4: #26262b;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0eff5;
+  --text2: #9998a8;
+  --text3: #605f6e;
+  --accent: #7c6ef4;
+  --accent2: #a99cf8;
+  --green: #4ade80;
+  --green-bg: rgba(74,222,128,0.1);
+  --yellow: #fbbf24;
+  --yellow-bg: rgba(251,191,36,0.1);
+  --red: #f87171;
+  --red-bg: rgba(248,113,113,0.1);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96,165,250,0.1);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font: 'Syne', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ─── Layout ─── */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; position: sticky; top: 0; height: 100vh; }
+.main { flex: 1; padding: 32px 36px; min-width: 0; }
+
+/* ─── Sidebar ─── */
+.logo { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; padding: 0 20px 24px; color: var(--accent2); text-transform: uppercase; }
+.logo span { color: var(--text3); font-weight: 400; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; border-left: 2px solid transparent; transition: all 0.15s; user-select: none; }
+.nav-item:hover { color: var(--text); background: var(--bg3); }
+.nav-item.active { color: var(--text); border-left-color: var(--accent); background: var(--bg3); }
+.nav-icon { width: 16px; text-align: center; font-size: 15px; }
+.sidebar-sep { height: 1px; background: var(--border); margin: 12px 0; }
+.sidebar-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); padding: 0 20px; margin-bottom: 4px; font-family: var(--mono); }
+
+/* ─── Panels ─── */
+.panel { display: none; }
+.panel.active { display: block; }
+.page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+
+/* ─── Cards / Grid ─── */
+.metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.metric { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.metric-label { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.metric-val { font-size: 26px; font-weight: 700; color: var(--text); }
+.metric-val.warn { color: var(--yellow); }
+
+.classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.class-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+.class-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.class-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.class-card-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.class-card-meta { font-size: 11px; font-family: var(--mono); color: var(--text3); margin-top: 3px; }
+.grade-chip { font-size: 20px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-sm); flex-shrink: 0; margin-left: 10px; }
+.ga { background: var(--green-bg); color: var(--green); }
+.gb { background: var(--blue-bg); color: var(--blue); }
+.gc { background: var(--yellow-bg); color: var(--yellow); }
+.gd,.gf { background: var(--red-bg); color: var(--red); }
+.class-card-bar-bg { height: 3px; background: var(--bg4); border-radius: 2px; margin-top: 12px; }
+.class-card-bar { height: 3px; border-radius: 2px; background: var(--accent); }
+.class-card-stats { display: flex; gap: 14px; margin-top: 10px; }
+.cs { font-size: 11px; font-family: var(--mono); color: var(--text3); }
+.cs span { color: var(--text2); }
+
+/* ─── Table ─── */
+.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th { text-align: left; font-size: 10px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg3); font-weight: 500; }
+.tbl td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text2); }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--bg3); }
+.tbl td:first-child { color: var(--text); font-weight: 500; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-family: var(--mono); font-weight: 500; }
+.pill-green { background: var(--green-bg); color: var(--green); }
+.pill-yellow { background: var(--yellow-bg); color: var(--yellow); }
+.pill-red { background: var(--red-bg); color: var(--red); }
+.pill-gray { background: var(--bg4); color: var(--text3); }
+.pill-blue { background: var(--blue-bg); color: var(--blue); }
+
+/* ─── Filters ─── */
+.filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-row select { font-family: var(--mono); font-size: 12px; padding: 7px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text2); }
+.filter-row select:focus { outline: none; border-color: var(--accent); }
+.filter-row input[type=text] { font-family: var(--font); font-size: 13px; padding: 7px 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); flex: 1; min-width: 180px; }
+.filter-row input:focus { outline: none; border-color: var(--accent); }
+
+/* ─── Buttons ─── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); transition: all 0.15s; }
+.btn:hover { color: var(--text); border-color: var(--border2); background: var(--bg4); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text3); }
+.btn-ghost:hover { color: var(--red); background: var(--red-bg); }
+.btn-todo { background: transparent; border-color: var(--border); color: var(--text3); padding: 3px 8px; font-family: var(--mono); font-size: 11px; }
+.btn-todo:hover { color: var(--accent2); border-color: var(--accent); background: rgba(124,110,244,0.08); }
+
+/* ─── Detail panel ─── */
+.detail-back { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); cursor: pointer; margin-bottom: 20px; }
+.detail-back:hover { color: var(--text2); }
+.detail-header-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+
+/* ─── Task builder ─── */
+.task-builder { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; }
+.task-builder h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+.form-group input, .form-group select, .form-group textarea { font-family: var(--font); font-size: 13px; padding: 9px 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 70px; }
+.form-span { grid-column: 1 / -1; }
+.form-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+/* ─── Task list ─── */
+.task-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; transition: border-color 0.15s; }
+.task-item.done { opacity: 0.45; }
+.task-item:hover { border-color: var(--border2); }
+.task-cb { width: 18px; height: 18px; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.15s; background: var(--bg3); }
+.task-cb:hover { border-color: var(--accent); }
+.task-cb.checked { background: var(--accent); border-color: var(--accent); }
+.task-cb.checked::after { content: '✓'; font-size: 12px; color: #fff; font-weight: 700; }
+.task-body { flex: 1; min-width: 0; }
+.task-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.task-title:hover { text-decoration: underline; }
+.task-title.done { text-decoration: line-through; }
+.task-meta { display: flex; gap: 10px; margin-top: 4px; align-items: center; flex-wrap: wrap; }
+.task-note { font-size: 12px; color: var(--text3); margin-top: 4px; font-style: italic; }
+.priority-high { background: var(--red-bg); color: var(--red); }
+.priority-medium { background: var(--yellow-bg); color: var(--yellow); }
+.priority-low { background: var(--blue-bg); color: var(--blue); }
+.tasks-section-label { font-size: 11px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin: 20px 0 8px; }
+
+/* ─── Import ─── */
+.import-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; }
+.import-box label { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 8px; }
+.import-box textarea { width: 100%; font-family: var(--mono); font-size: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text2); padding: 12px; resize: vertical; min-height: 220px; }
+.import-box textarea:focus { outline: none; border-color: var(--accent); }
+.import-hint { font-size: 12px; color: var(--text3); line-height: 1.8; }
+.import-hint ol { padding-left: 16px; }
+.import-hint kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; background: var(--bg4); border: 1px solid var(--border2); border-radius: 4px; color: var(--text2); }
+.imported-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 6px; }
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); font-size: 13px; color: var(--text); z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok { border-color: var(--green); color: var(--green); }
+.toast.err { border-color: var(--red); color: var(--red); }
+
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty svg { margin-bottom: 12px; opacity: 0.3; }
+.empty p { font-size: 14px; margin-top: 6px; }
+.empty strong { font-size: 16px; font-weight: 600; color: var(--text2); display: block; }
+
+/* ─── Settings ─── */
+.settings-section { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+.settings-section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.settings-section-header h3 { font-size: 13px; font-weight: 600; color: var(--text); }
+.settings-section-header span { font-size: 11px; font-family: var(--mono); color: var(--text3); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.settings-row:last-child { border-bottom: none; }
+.settings-row-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.settings-row-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.settings-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 20px; }
+.toggle { width: 36px; height: 20px; border-radius: 10px; background: var(--bg4); border: 1px solid var(--border2); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+.toggle.on { background: var(--accent); border-color: var(--accent); }
+.toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--text3); transition: transform 0.2s, background 0.2s; }
+.toggle.on::after { transform: translateX(16px); background: #fff; }
+.settings-select { font-family: var(--mono); font-size: 12px; padding: 6px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text2); }
+.settings-select:focus { outline: none; border-color: var(--accent); }
+.danger-zone { border-color: rgba(248,113,113,0.25); }
+.danger-zone .settings-section-header { border-bottom-color: rgba(248,113,113,0.2); }
+.danger-zone .settings-section-header h3 { color: var(--red); }
+
+/* ─── Compact mode ─── */
+body.compact .main { padding: 20px 24px; }
+body.compact .tbl td, body.compact .tbl th { padding: 7px 10px; }
+body.compact .task-item { padding: 10px 12px; }
+body.compact .metric { padding: 12px 14px; }
+body.compact .metric-val { font-size: 20px; }
+body.compact .class-card { padding: 12px 14px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">MiStar<br><span>Tracker</span></div>
+    <div class="sidebar-label">Overview</div>
+    <div class="nav-item active" onclick="nav('grades')"><span class="nav-icon">◈</span> Grades</div>
+    <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Data</div>
+    <div class="nav-item" onclick="nav('assignments')"><span class="nav-icon">🗐</span> Assignments</div>
+    <div class="nav-item" onclick="nav('import')"><span class="nav-icon">⤒</span> Import</div>
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Settings</div>
+    <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⛭</span>Preferences</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- ── Grades ── -->
+    <div id="panel-grades" class="panel active">
+      <div id="grades-overview">
+        <div class="page-title">Grades</div>
+        <div class="page-sub">Click a class to see assignments</div>
+        <div class="metric-row" id="metrics"></div>
+        <div class="classes-grid" id="classes-grid"></div>
+        <div id="grades-empty" class="empty" style="display:none">
+          <strong>No classes yet</strong>
+          <p onclick="nav('import')" style="text-decoration: underline; cursor: pointer;">Import your MiStar data to get started</p>
+        </div>
+      </div>
+      <div id="grades-detail" style="display:none">
+        <div class="detail-back" onclick="closeDetail()">← Back to grades</div>
+        <div class="detail-header-box">
+          <div>
+            <div style="font-size:17px; font-weight:600" id="detail-title"></div>
+            <div style="font-size:12px; font-family:var(--mono); color:var(--text3); margin-top:4px" id="detail-sub"></div>
+          </div>
+          <div id="detail-grade-chip" class="grade-chip"></div>
+        </div>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr>
+              <th style="width:35%">Assignment</th>
+              <th>Due</th>
+              <th>Score</th>
+              <th>Points</th>
+              <th>Notes</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="detail-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tasks ── -->
+    <div id="panel-tasks" class="panel">
+      <div class="page-title">Tasks</div>
+      <div class="page-sub">Build tasks manually or add from assignments</div>
+
+      <div class="task-builder">
+        <h3>+ New Task</h3>
+        <div class="form-grid">
+          <div class="form-group form-span">
+            <label>Title</label>
+            <input type="text" id="t-title" placeholder="e.g. Study for Unit 3 Test">
+          </div>
+          <div class="form-group">
+            <label>Class</label>
+            <select id="t-class"><option value="">— Any —</option></select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="t-priority">
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Due date</label>
+            <input type="date" id="t-due">
+          </div>
+          <div class="form-group form-span">
+            <label>Notes (optional)</label>
+            <textarea id="t-notes" placeholder="Any extra details…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+          <button class="btn" onclick="clearTaskForm()">Clear</button>
+        </div>
+      </div>
+
+      <div id="tasks-empty" class="empty" style="display:none">
+        <strong>No tasks yet</strong>
+        <p>Build one above, or use "+ Add to tasks" on any assignment</p>
+      </div>
+      <div id="tasks-list"></div>
+    </div>
+
+    <!-- ── Assignments ── -->
+    <div id="panel-assignments" class="panel">
+      <div class="page-title">All Assignments</div>
+      <div class="page-sub" id="assign-sub"></div>
+      <div class="filter-row">
+        <input type="text" id="a-search" placeholder="Search assignments…" oninput="renderAssignments()">
+        <select id="a-class" onchange="renderAssignments()"><option value="all">All classes</option></select>
+        <select id="a-status" onchange="renderAssignments()">
+          <option value="all">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="scored">Scored</option>
+          <option value="low">Low score (&lt;70%)</option>
+          <option value="excused">Excused</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:30%">Assignment</th>
+            <th>Class</th>
+            <th>Due</th>
+            <th>Score</th>
+            <th>Notes</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="assign-tbody"></tbody>
+        </table>
+      </div>
+      <div id="assign-empty" class="empty" style="display:none">
+        <strong>No assignments match</strong>
+        <p>Try different filters</p>
+      </div>
+    </div>
+
+    <!-- ── Import ── -->
+    <div id="panel-import" class="panel">
+      <div class="page-title">Import</div>
+      <div class="page-sub">Paste one class — or all of them at once</div>
+      <div class="import-box">
+        <label>Paste MiStar gradebook text (one or multiple classes)</label>
+        <textarea id="paste-input" placeholder="Per: 1   Physical Education (HPE003)&#10;Current Quarter 4 Grade: A-&#10;Teacher: ..."></textarea>
+        <div style="display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="parseAndImport()">↑ Parse & Import</button>
+          <button class="btn" onclick="document.getElementById('paste-input').value=''">Clear</button>
+          <span style="font-size:12px; color:var(--text3);">Supports pasting the entire page at once (Ctrl+A, Ctrl+C)</span>
+        </div>
+      </div>
+      <div class="import-box import-hint">
+        <label>How to get your data</label>
+        <ol>
+          <li>Open <a href="https://mistar.oakland.k12.mi.us" target="_blank" style="color:var(--accent2)">MiStar Student Portal</a> and log in</li>
+          <li>Open a class gradebook</li>
+          <li>Press <kbd>Ctrl+A</kbd> then <kbd>Ctrl+C</kbd></li>
+          <li>Paste above and click Parse &amp; Import</li>
+          <li>Repeat for any remaining classes</li>
+        </ol>
+      </div>
+      <div id="imported-list" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- ── Settings ── -->
+    <div id="panel-settings" class="panel">
+      <div class="page-title">Preferences</div>
+      <div class="page-sub">Customize how MiStar Tracker looks and behaves</div>
+
+      <div class="settings-section">
+        <div class="settings-section-header"><h3>Appearance</h3></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Accent color</div>
+            <div class="settings-row-desc">Highlight color used for active items and buttons</div>
+          </div>
+          <div class="settings-row-right"><div id="color-swatches" style="display:flex;gap:6px;"></div></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Compact mode</div>
+            <div class="settings-row-desc">Reduce padding and font sizes throughout the app</div>
+          </div>
+          <div class="settings-row-right"><div class="toggle" id="toggle-compact" onclick="toggleSetting('compactMode')"></div></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Show period numbers on cards</div>
+            <div class="settings-row-desc">Display "Per 1 ·" prefix on class cards</div>
+          </div>
+          <div class="settings-row-right"><div class="toggle" id="toggle-period" onclick="toggleSetting('showPeriod')"></div></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-header"><h3>Grades</h3></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Low score threshold</div>
+            <div class="settings-row-desc">Assignments below this % are flagged red</div>
+          </div>
+          <div class="settings-row-right">
+            <select class="settings-select" id="setting-lowThreshold" onchange="saveSetting('lowThreshold', this.value)">
+              <option value="60">60%</option><option value="70">70%</option><option value="75">75%</option><option value="80">80%</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Default assignment sort</div>
+            <div class="settings-row-desc">How assignments are ordered in class detail view</div>
+          </div>
+          <div class="settings-row-right">
+            <select class="settings-select" id="setting-assignSort" onchange="saveSetting('assignSort', this.value)">
+              <option value="newest">Newest first</option><option value="oldest">Oldest first</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Show calculated % on grade cards</div>
+            <div class="settings-row-desc">Display computed percentage alongside the letter grade</div>
+          </div>
+          <div class="settings-row-right"><div class="toggle" id="toggle-showPct" onclick="toggleSetting('showPct')"></div></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-header"><h3>Tasks</h3></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Auto-priority threshold</div>
+            <div class="settings-row-desc">Score % below which "+ task" defaults to medium priority</div>
+          </div>
+          <div class="settings-row-right">
+            <select class="settings-select" id="setting-autoPriority" onchange="saveSetting('autoPriority', this.value)">
+              <option value="60">60%</option><option value="70">70%</option><option value="80">80%</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Hide completed tasks after</div>
+            <div class="settings-row-desc">Auto-collapse the completed section after N days</div>
+          </div>
+          <div class="settings-row-right">
+            <select class="settings-select" id="setting-hideCompleted" onchange="saveSetting('hideCompleted', this.value)">
+              <option value="never">Never</option><option value="1">1 day</option><option value="7">7 days</option><option value="30">30 days</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-header"><h3>Data</h3><span>Stored in your browser's localStorage</span></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Storage usage</div>
+            <div class="settings-row-desc" id="storage-usage">Calculating…</div>
+          </div>
+          <div class="settings-row-right">
+            <button class="btn btn-sm" onclick="exportData()">⬇ Export JSON</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Import backup</div>
+            <div class="settings-row-desc">Restore from a previously exported JSON file</div>
+          </div>
+          <div class="settings-row-right">
+            <label class="btn btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section danger-zone">
+        <div class="settings-section-header"><h3>⚠ Danger zone</h3></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Clear all tasks</div>
+            <div class="settings-row-desc">Permanently delete all tasks — cannot be undone</div>
+          </div>
+          <div class="settings-row-right">
+            <button class="btn btn-sm btn-ghost" style="color:var(--red);border-color:rgba(248,113,113,0.3);" onclick="clearAllTasks()">Clear tasks</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Clear all data</div>
+            <div class="settings-row-desc">Delete all imported classes, assignments, and tasks</div>
+          </div>
+          <div class="settings-row-right">
+            <button class="btn btn-sm btn-ghost" style="color:var(--red);border-color:rgba(248,113,113,0.3);" onclick="clearAllData()">Clear everything</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+let classes = JSON.parse(localStorage.getItem('mst_classes') || '[]');
+let tasks   = JSON.parse(localStorage.getItem('mst_tasks')   || '[]');
+
+function save() {
+  localStorage.setItem('mst_classes', JSON.stringify(classes));
+  localStorage.setItem('mst_tasks',   JSON.stringify(tasks));
+}
+
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (ok ? 'ok' : 'err');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ── Navigation ──────────────────────────────────────────────
+function nav(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'grades') renderGrades();
+  if (id === 'tasks') renderTasks();
+  if (id === 'assignments') renderAssignments();
+  if (id === 'import') renderImportedList();
+  if (id === 'settings') { renderSettings(); }
+}
+
+// ── Parser ──────────────────────────────────────────────────
+function parseMiStar(text) {
+  // Split text into per-class chunks at every "Per: N" header
+  const chunks = text.split(/(?=Per:\s*\d+\s+)/);
+  const results = [];
+
+  for (const chunk of chunks) {
+    if (!chunk.trim()) continue;
+
+    const headerMatch = chunk.match(/Per:\s*(\d+)\s+(.+?)\(([A-Z0-9]+)\)/);
+    if (!headerMatch) continue;
+
+    const period = headerMatch[1];
+    const name   = headerMatch[2].trim();
+    const code   = headerMatch[3].trim();
+
+    const gradeMatch   = chunk.match(/Current\s+(?:Quarter\s+\d+\s+)?Grade:\s*([A-F][+-]?)(?:\s*\(([\d.]+)%\))?/i);
+    const teacherMatch = chunk.match(/Teacher:\s*([^\n\t]+)/);
+
+    const grade   = gradeMatch  ? gradeMatch[1]  : '';
+    const gradePct= gradeMatch  ? gradeMatch[2]  : '';
+    const teacher = teacherMatch ? teacherMatch[1].trim() : '';
+
+    const lines = chunk.split('\n').map(l => l.trim());
+
+    // Find where assignments start (after the column header row)
+    let assignIdx = -1;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes('Assignment') && lines[i].includes('Date Due')) {
+        assignIdx = i + 1;
+        break;
+      }
+    }
+    // Skip multi-line header continuations (Pts\nPossible, etc.)
+    if (assignIdx >= 0) {
+      while (assignIdx < lines.length) {
+        const l = lines[assignIdx];
+        if (/\d{2}\/\d{2}\/\d{4}/.test(l)) break;
+        assignIdx++;
+      }
+    }
+
+    const assignments = [];
+    if (assignIdx >= 0) {
+      for (let i = assignIdx; i < lines.length; i++) {
+        const line = lines[i];
+        if (!/\d{2}\/\d{2}\/\d{4}/.test(line)) continue;
+
+        const parts = line.split(/\t+/).map(p => p.trim()).filter(p => p !== '');
+        
+        // Find the two dates (Date Due, Assigned) then everything after is assignment data
+        let dateCount = 0;
+        let afterDatesIdx = 0;
+        for (let j = 0; j < parts.length; j++) {
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(parts[j])) {
+            dateCount++;
+            if (dateCount === 2) { afterDatesIdx = j + 1; break; }
+          }
+        }
+        if (dateCount < 2) afterDatesIdx = 1;
+
+        const dateMatch = line.match(/\d{2}\/\d{2}\/\d{4}/);
+        const due = dateMatch ? dateMatch[0] : '';
+        const rest = parts.slice(afterDatesIdx);
+        if (!rest.length) continue;
+
+        const assignName = rest[0];
+        let possible = '', score = '', scoredAs = '', notGraded = false, comment = '';
+        let idx = 1;
+
+        if (idx < rest.length && /^\d+(\.\d+)?$/.test(rest[idx])) { possible = rest[idx]; idx++; }
+
+        if (idx < rest.length) {
+          const v = rest[idx];
+          if (/^\d+(\.\d+)?$/.test(v)) { score = v; idx++; }
+          else if (v === 'checked') { notGraded = true; idx++; }
+          else { scoredAs = v; idx++; }
+        }
+
+        while (idx < rest.length) {
+          const v = rest[idx];
+          if (v === 'checked') { notGraded = true; }
+          else if (v && v.length > 1 && !/^\d+(\.\d+)?$/.test(v) && !scoredAs) { scoredAs = v; }
+          else if (v && v.length > 1 && !/^\d+(\.\d+)?$/.test(v) && scoredAs && !comment) { comment = v; }
+          idx++;
+        }
+
+        if (assignName) assignments.push({ due, name: assignName, possible, score, scoredAs, notGraded, comment });
+      }
+    }
+
+    results.push({ period, name, code, grade, gradePct, teacher, assignments, importedAt: new Date().toISOString() });
+  }
+
+  return results;
+}
+
+function parseAndImport() {
+  const raw = document.getElementById('paste-input').value.trim();
+  if (!raw) { toast('Paste something first!', false); return; }
+
+  const parsed = parseMiStar(raw);
+  if (!parsed.length) { toast('Could not find any classes — check the pasted text.', false); return; }
+
+  let added = 0, updated = 0;
+  parsed.forEach(p => {
+    const i = classes.findIndex(c => c.code === p.code);
+    if (i >= 0) { classes[i] = p; updated++; }
+    else { classes.push(p); added++; }
+  });
+
+  save();
+  rebuildClassSelects();
+  document.getElementById('paste-input').value = '';
+  renderImportedList();
+  toast(`Imported ${added + updated} class${added + updated !== 1 ? 'es' : ''} (${added} new, ${updated} updated)`);
+}
+
+function rebuildClassSelects() {
+  ['a-class', 't-class'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = i === 0 ? '<option value="all">All classes</option>' : '<option value="">— Any —</option>';
+    classes.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.code; o.textContent = `Per ${c.period}: ${c.name}`;
+      sel.appendChild(o);
+    });
+  });
+}
+
+// ── Grades ──────────────────────────────────────────────────
+function gradeClass(g) {
+  if (!g) return '';
+  const u = g.toUpperCase();
+  if (u.startsWith('A')) return 'ga';
+  if (u.startsWith('B')) return 'gb';
+  if (u.startsWith('C')) return 'gc';
+  if (u.startsWith('D')) return 'gd';
+  return 'gf';
+}
+
+function computePct(c) {
+  const scored = c.assignments.filter(a => a.score && a.possible);
+  if (!scored.length) return null;
+  return (scored.reduce((s, a) => s + parseFloat(a.score), 0) /
+          scored.reduce((s, a) => s + parseFloat(a.possible), 0) * 100).toFixed(1);
+}
+
+function renderGrades() {
+  const grid  = document.getElementById('classes-grid');
+  const empty = document.getElementById('grades-empty');
+  const mets  = document.getElementById('metrics');
+
+  if (!classes.length) { grid.innerHTML = ''; mets.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  let tA = 0, tS = 0, tP = 0, tNG = 0;
+  classes.forEach(c => {
+    c.assignments.forEach(a => {
+      tA++;
+      if (a.notGraded) tNG++;
+      if (a.score && a.possible) { tS += parseFloat(a.score); tP += parseFloat(a.possible); }
+    });
+  });
+
+  mets.innerHTML = `
+    <div class="metric"><div class="metric-label">Classes</div><div class="metric-val">${classes.length}</div></div>
+    <div class="metric"><div class="metric-label">Overall</div><div class="metric-val">${tP > 0 ? (tS/tP*100).toFixed(1)+'%' : '—'}</div></div>
+    <div class="metric"><div class="metric-label">Assignments</div><div class="metric-val">${tA}</div></div>
+    <div class="metric"><div class="metric-label">Pending</div><div class="metric-val ${tNG > 0 ? 'warn' : ''}">${tNG}</div></div>`;
+
+  grid.innerHTML = classes.map((c, i) => {
+    const pct = computePct(c);
+    const ng = c.assignments.filter(a => a.notGraded).length;
+    const barW = pct ? Math.min(parseFloat(pct), 100) : 0;
+    return `<div class="class-card" onclick="showDetail(${i})">
+      <div class="class-card-top">
+        <div>
+          <div class="class-card-name">Per ${c.period} · ${c.name}</div>
+          <div class="class-card-meta">${c.code} · ${c.teacher}</div>
+        </div>
+        <div class="grade-chip ${gradeClass(c.grade)}">${c.grade || '—'}</div>
+      </div>
+      ${pct ? `<div class="class-card-bar-bg"><div class="class-card-bar" style="width:${barW}%"></div></div>` : ''}
+      <div class="class-card-stats">
+        <div class="cs">Score: <span>${pct !== null ? pct+'%' : '—'}</span></div>
+        <div class="cs">Items: <span>${c.assignments.length}</span></div>
+        ${ng > 0 ? `<div class="cs" style="color:var(--yellow)">Pending: <span style="color:var(--yellow)">${ng}</span></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(idx) {
+  const c = classes[idx];
+  document.getElementById('grades-overview').style.display = 'none';
+  document.getElementById('grades-detail').style.display = 'block';
+  document.getElementById('detail-title').textContent = c.name;
+  document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
+  const chip = document.getElementById('detail-grade-chip');
+  chip.textContent = c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—';
+  chip.className = `grade-chip ${gradeClass(c.grade)}`;
+
+  document.getElementById('detail-tbody').innerHTML = c.assignments.map(a =>
+    `<tr>
+      <td title="${a.name}">${a.name}</td>
+      <td style="font-family:var(--mono);font-size:12px">${a.due}</td>
+      <td>${scoreDisplay(a)}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${a.possible || '—'}</td>
+      <td>${notesDisplay(a)}</td>
+      <td><button class="btn btn-todo" onclick="addToTasks(${idx},'${encodeURIComponent(a.name)}','${a.due}')">+ task</button></td>
+    </tr>`
+  ).join('');
+}
+
+function closeDetail() {
+  document.getElementById('grades-overview').style.display = '';
+  document.getElementById('grades-detail').style.display = 'none';
+}
+
+function scoreDisplay(a) {
+  if (a.notGraded) return `<span class="pill pill-gray">Pending</span>`;
+  if (a.scoredAs && /excus/i.test(a.scoredAs)) return `<span class="pill pill-blue">Excused</span>`;
+  if (a.score) {
+    const p = a.possible ? parseFloat(a.score) / parseFloat(a.possible) * 100 : null;
+    const cls = p === null ? 'pill-gray' : p >= 90 ? 'pill-green' : p >= 70 ? 'pill-yellow' : 'pill-red';
+    return `<span class="pill ${cls}">${a.score}</span>`;
+  }
+  if (a.scoredAs) return `<span class="pill pill-gray">${a.scoredAs}</span>`;
+  return `<span class="pill pill-gray">—</span>`;
+}
+
+function notesDisplay(a) {
+  const parts = [
+    a.scoredAs && !/excus/i.test(a.scoredAs) ? a.scoredAs : '',
+    a.comment
+  ].filter(Boolean).join(' · ');
+  return parts ? `<span style="font-size:12px;color:var(--text3)" title="${parts}">${parts.slice(0,40)}${parts.length>40?'…':''}</span>` : '';
+}
+
+// ── Assignments ──────────────────────────────────────────────
+function renderAssignments() {
+  const search  = document.getElementById('a-search').value.toLowerCase();
+  const cls     = document.getElementById('a-class').value;
+  const status  = document.getElementById('a-status').value;
+  const tbody   = document.getElementById('assign-tbody');
+  const empty   = document.getElementById('assign-empty');
+  const sub     = document.getElementById('assign-sub');
+
+  let all = [];
+  classes.forEach((c, ci) => c.assignments.forEach(a => all.push({ ...a, cls: c, ci })));
+
+  if (cls !== 'all') all = all.filter(a => a.cls.code === cls);
+  if (status === 'pending')  all = all.filter(a => a.notGraded);
+  if (status === 'scored')   all = all.filter(a => a.score && !a.notGraded);
+  if (status === 'excused')  all = all.filter(a => a.scoredAs && /excus/i.test(a.scoredAs));
+  if (status === 'low')      all = all.filter(a => a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7);
+  if (search) all = all.filter(a => a.name.toLowerCase().includes(search) || a.cls.name.toLowerCase().includes(search));
+
+  all.sort((a, b) => new Date(b.due) - new Date(a.due));
+  sub.textContent = `${all.length} assignment${all.length !== 1 ? 's' : ''}`;
+
+  if (!all.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = all.map(a =>
+    `<tr>
+      <td title="${a.name}">${a.name}</td>
+      <td style="font-size:12px;color:var(--text3)">Per ${a.cls.period} · ${a.cls.name.split(' ').slice(0,3).join(' ')}</td>
+      <td style="font-family:var(--mono);font-size:12px">${a.due}</td>
+      <td>${scoreDisplay(a)}</td>
+      <td>${notesDisplay(a)}</td>
+      <td><button class="btn btn-todo" onclick="addToTasks(${a.ci},'${encodeURIComponent(a.name)}','${a.due}')">+ task</button></td>
+    </tr>`
+  ).join('');
+}
+
+// ── Tasks ────────────────────────────────────────────────────
+function addToTasks(classIdx, encodedName, due) {
+  const name = decodeURIComponent(encodedName);
+  const c = classes[classIdx];
+  // Auto-detect priority: pending = high, low score = medium, else low
+  const a = c.assignments.find(x => x.name === name);
+  let priority = 'low';
+  if (a) {
+    if (a.notGraded) priority = 'high';
+    else if (a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7) priority = 'medium';
+  }
+  const exists = tasks.find(t => t.title === name && t.classCode === c.code);
+  if (exists) { toast(`"${name}" is already in tasks`); return; }
+  tasks.push({ id: Date.now(), title: name, classCode: c.code, priority, due, notes: '', completed: false });
+  save();
+  toast(`Added "${name.slice(0,30)}…" to tasks`);
+}
+
+function addTask() {
+  const title = document.getElementById('t-title').value.trim();
+  if (!title) { toast('Enter a title', false); return; }
+  tasks.push({
+    id: Date.now(),
+    title,
+    classCode: document.getElementById('t-class').value,
+    priority:  document.getElementById('t-priority').value,
+    due:       document.getElementById('t-due').value,
+    notes:     document.getElementById('t-notes').value.trim(),
+    completed: false
+  });
+  save();
+  clearTaskForm();
+  renderTasks();
+  toast('Task added');
+}
+
+function clearTaskForm() {
+  ['t-title','t-due','t-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('t-class').value = '';
+  document.getElementById('t-priority').value = 'medium';
+}
+
+function toggleTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.completed = !t.completed; save(); renderTasks(); }
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(x => x.id !== id);
+  save(); renderTasks();
+}
+function editTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+
+  const row = document.getElementById('task-row-' + id);
+  if (!row) return;
+
+  const classOptions = classes.map(c =>
+    `<option value="${c.code}" ${t.classCode === c.code ? 'selected' : ''}>Per ${c.period}: ${c.name}</option>`
+  ).join('');
+
+  row.innerHTML = `
+    <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:4px 0;">
+      <input id="e-title-${id}" style="grid-column:1/-1; font-family:var(--font); font-size:13px; padding:7px 10px; background:var(--bg3); border:1px solid var(--accent); border-radius:var(--radius-sm); color:var(--text);" value="${t.title.replace(/"/g,'&quot;')}">
+      <select id="e-class-${id}" style="font-family:var(--font); font-size:12px; padding:6px 8px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);">
+        <option value="">— Any —</option>${classOptions}
+      </select>
+      <select id="e-priority-${id}" style="font-family:var(--font); font-size:12px; padding:6px 8px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);">
+        <option value="high" ${t.priority==='high'?'selected':''}>High</option>
+        <option value="medium" ${t.priority==='medium'?'selected':''}>Medium</option>
+        <option value="low" ${t.priority==='low'?'selected':''}>Low</option>
+      </select>
+      <input id="e-due-${id}" type="date" value="${t.due||''}" style="font-family:var(--mono); font-size:12px; padding:6px 8px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);">
+      <textarea id="e-notes-${id}" rows="2" placeholder="Notes…" style="grid-column:1/-1; font-family:var(--font); font-size:12px; padding:7px 10px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); resize:vertical;">${t.notes||''}</textarea>
+      <div style="grid-column:1/-1; display:flex; gap:6px;">
+        <button class="btn btn-primary btn-sm" onclick="saveTask(${id})">Save</button>
+        <button class="btn btn-sm" onclick="renderTasks()">Cancel</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="deleteTask(${id})" title="Delete">✕</button>`;
+}
+
+function saveTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  const title = document.getElementById('e-title-' + id).value.trim();
+  if (!title) { toast('Title cannot be empty', false); return; }
+  t.title     = title;
+  t.classCode = document.getElementById('e-class-' + id).value;
+  t.priority  = document.getElementById('e-priority-' + id).value;
+  t.due       = document.getElementById('e-due-' + id).value;
+  t.notes     = document.getElementById('e-notes-' + id).value.trim();
+  save();
+  renderTasks();
+  toast('Task updated');
+}
+
+function renderTasks() {
+  const list  = document.getElementById('tasks-list');
+  const empty = document.getElementById('tasks-empty');
+  if (!tasks.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const pOrder = { high: 0, medium: 1, low: 2 };
+  const active = tasks.filter(t => !t.completed).sort((a, b) => pOrder[a.priority] - pOrder[b.priority] || new Date(a.due||'9999-12-31') - new Date(b.due||'9999-12-31'));
+  const done   = tasks.filter(t =>  t.completed);
+
+  const renderTask = t => {
+    const c = classes.find(x => x.code === t.classCode);
+    return `<div class="task-item ${t.completed ? 'done' : ''}" id="task-row-${t.id}">
+      <div class="task-cb ${t.completed ? 'checked' : ''}" onclick="toggleTask(${t.id})"></div>
+      <div class="task-body">
+          <div class="task-title ${t.completed ? 'done' : ''}" onclick="editTask(${t.id})" style="cursor:pointer" title="Click to edit">${t.title}</div>
+        <div class="task-meta">
+          ${c ? `<span class="pill pill-gray">${c.name.split(' ').slice(0,3).join(' ')}</span>` : ''}
+          <span class="pill priority-${t.priority}">${t.priority}</span>
+          ${t.due ? `<span style="font-size:12px;font-family:var(--mono);color:var(--text3)">${new Date(t.due + 'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>` : ''}
+        </div>
+        ${t.notes ? `<div class="task-note">${t.notes}</div>` : ''}
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="deleteTask(${t.id})" title="Delete">✕</button>
+    </div>`;
+  };
+
+  list.innerHTML =
+    (active.length ? `<div class="tasks-section-label">Active · ${active.length}</div>` + active.map(renderTask).join('') : '') +
+    (done.length   ? `<div class="tasks-section-label">Completed · ${done.length}</div>` + done.map(renderTask).join('') : '');
+}
+
+// ── Import list ──────────────────────────────────────────────
+function renderImportedList() {
+  const el = document.getElementById('imported-list');
+  if (!classes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` +
+    classes.map((c, i) =>
+      `<div class="imported-row">
+        <div>
+          <span style="font-size:14px;font-weight:500">${c.name}</span>
+          <span style="font-size:12px;font-family:var(--mono);color:var(--text3);margin-left:8px">${c.code}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:var(--text3)">${c.assignments.length} items</span>
+          <button class="btn btn-ghost btn-sm" onclick="deleteClass(${i})" title="Remove">✕</button>
+        </div>
+      </div>`
+    ).join('');
+}
+
+// ── Settings ─────────────────────────────────────────────────
+const SETTING_DEFAULTS = {
+  compactMode:   false,
+  showPeriod:    true,
+  showPct:       true,
+  lowThreshold:  '70',
+  assignSort:    'newest',
+  autoPriority:  '70',
+  hideCompleted: 'never',
+  accentColor:   '#7c6ef4',
+};
+const ACCENT_COLORS = [
+  { hex: '#7c6ef4', name: 'Violet' },
+  { hex: '#60a5fa', name: 'Blue'   },
+  { hex: '#4ade80', name: 'Green'  },
+  { hex: '#f472b6', name: 'Pink'   },
+  { hex: '#fb923c', name: 'Orange' },
+  { hex: '#a78bfa', name: 'Purple' },
+];
+
+let settings = { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem('mst_settings') || '{}') };
+
+function saveSetting(key, value) {
+  settings[key] = value;
+  localStorage.setItem('mst_settings', JSON.stringify(settings));
+  applySettings();
+}
+
+function toggleSetting(key) {
+  saveSetting(key, !settings[key]);
+  renderSettings();
+}
+
+function applySettings() {
+  // Accent color
+  document.documentElement.style.setProperty('--accent', settings.accentColor);
+  // Darken accent for accent2 (simple lightening via opacity trick)
+  document.documentElement.style.setProperty('--accent2', settings.accentColor + 'cc');
+  // Compact mode
+  document.body.classList.toggle('compact', !!settings.compactMode);
+  const favicon = document.querySelector('link[rel="icon"]');
+  favicon.href = `https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=${settings.accentColor.replace('#', '')}`;
+}
+
+function renderSettings() {
+  // Toggles
+  ['compact','period','showPct'].forEach(key => {
+    const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct' };
+    const el = document.getElementById('toggle-' + key);
+    if (el) el.classList.toggle('on', !!settings[map[key]]);
+  });
+
+  // Selects
+  ['lowThreshold','assignSort','autoPriority','hideCompleted'].forEach(key => {
+    const el = document.getElementById('setting-' + key);
+    if (el) el.value = settings[key];
+  });
+
+  // Color swatches
+  const sw = document.getElementById('color-swatches');
+  if (sw) {
+    sw.innerHTML = ACCENT_COLORS.map(c =>
+      `<div onclick="saveSetting('accentColor','${c.hex}'); renderSettings();"
+        title="${c.name}"
+        style="width:22px;height:22px;border-radius:50%;background:${c.hex};cursor:pointer;
+               border:2px solid ${settings.accentColor === c.hex ? '#fff' : 'transparent'};
+               transition:border-color 0.15s;"></div>`
+    ).join('');
+  }
+
+  // Storage usage
+  const usageEl = document.getElementById('storage-usage');
+  if (usageEl) {
+    try {
+      const bytes = new Blob([localStorage.getItem('mst_classes')||'', localStorage.getItem('mst_tasks')||'']).size;
+      usageEl.textContent = bytes < 1024
+        ? `${bytes} bytes used`
+        : `${(bytes/1024).toFixed(1)} KB used · ${classes.length} class${classes.length!==1?'es':''}, ${tasks.length} task${tasks.length!==1?'s':''}`;
+    } catch(e) { usageEl.textContent = 'Unable to calculate'; }
+  }
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify({ classes, tasks, settings }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `mistar-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('Backup downloaded');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.classes) { classes = data.classes; localStorage.setItem('mst_classes', JSON.stringify(classes)); }
+      if (data.tasks)   { tasks   = data.tasks;   localStorage.setItem('mst_tasks',   JSON.stringify(tasks));   }
+      if (data.settings){ settings = { ...SETTING_DEFAULTS, ...data.settings }; localStorage.setItem('mst_settings', JSON.stringify(settings)); }
+      rebuildClassSelects();
+      applySettings();
+      renderSettings();
+      toast(`Restored: ${classes.length} classes, ${tasks.length} tasks`);
+    } catch(err) { toast('Invalid backup file', false); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function clearAllTasks() {
+  if (!confirm('Delete all tasks? This cannot be undone.')) return;
+  tasks = [];
+  save();
+  toast('All tasks cleared');
+}
+
+function clearAllData() {
+  if (!confirm('Delete ALL classes, assignments, and tasks? This cannot be undone.')) return;
+  classes = []; tasks = [];
+  save();
+  rebuildClassSelects();
+  renderGrades();
+  toast('All data cleared');
+}
+
+function deleteClass(i) {
+  const code = classes[i].code;
+  classes.splice(i, 1);
+  tasks = tasks.filter(t => t.classCode !== code);
+  save();
+  rebuildClassSelects();
+  renderImportedList();
+  toast('Class removed');
+}
+
+// ── Init ─────────────────────────────────────────────────────
+rebuildClassSelects();
+applySettings();
+renderGrades();
+</script>
+</body>
+</html>
