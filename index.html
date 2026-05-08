@@ -374,7 +374,7 @@ body.compact .class-card { padding: 12px 14px; }
             <div class="settings-row-label">Accent color</div>
             <div class="settings-row-desc">Highlight color used for active items and buttons</div>
           </div>
-          <div class="settings-row-right"><div id="color-swatches" style="display:flex;gap:6px;"></div></div>
+          <div class="settings-row-right"><div id="color-swatches" style="display:flex;gap:6px;"></div><input type="color" id="picker" value="#7c6ef4" onchange="updateCustomColor(this.value)"></div>
         </div>
         <div class="settings-row">
           <div>
@@ -976,16 +976,13 @@ const SETTING_DEFAULTS = {
   hideCompleted: 'never',
   accentColor:   '#7c6ef4',
 };
-const ACCENT_COLORS = [
-  { hex: '#7c6ef4', name: 'Violet' },
-  { hex: '#60a5fa', name: 'Blue'   },
-  { hex: '#4ade80', name: 'Green'  },
-  { hex: '#f472b6', name: 'Pink'   },
-  { hex: '#fb923c', name: 'Orange' },
-  { hex: '#a78bfa', name: 'Purple' },
-];
 
 let settings = { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem('mst_settings') || '{}') };
+
+function updateCustomColor(hex) {
+  saveSetting('accentColor', hex);
+  renderSettings(); // This redraws the swatches with the new hex
+}
 
 function saveSetting(key, value) {
   settings[key] = value;
@@ -1023,15 +1020,27 @@ function renderSettings() {
     if (el) el.value = settings[key];
   });
 
-  // Color swatches
   const sw = document.getElementById('color-swatches');
   if (sw) {
-    sw.innerHTML = ACCENT_COLORS.map(c =>
+    // Define colors inside render so "Custom" can update
+    const currentPickerColor = document.getElementById('picker').value;
+    const colors = [
+      { hex: '#7c6ef4', name: 'Violet' },
+      { hex: '#60a5fa', name: 'Blue'   },
+      { hex: '#4ade80', name: 'Green'  },
+      { hex: '#f472b6', name: 'Pink'   },
+      { hex: '#fb923c', name: 'Orange' },
+      { hex: '#a78bfa', name: 'Purple' },
+      { hex: currentPickerColor, name: 'Custom' },
+    ];
+
+    sw.innerHTML = colors.map(c =>
       `<div onclick="saveSetting('accentColor','${c.hex}'); renderSettings();"
         title="${c.name}"
         style="width:22px;height:22px;border-radius:50%;background:${c.hex};cursor:pointer;
-               border:2px solid ${settings.accentColor === c.hex ? '#fff' : 'transparent'};
-               transition:border-color 0.15s;"></div>`
+               border:2px solid ${settings.accentColor.toLowerCase() === c.hex.toLowerCase() ? '#fff' : 'transparent'};
+               box-shadow: 0 0 0 1px ${settings.accentColor.toLowerCase() === c.hex.toLowerCase() ? '#0002' : 'transparent'};
+               transition: all 0.15s;"></div>`
     ).join('');
   }
 
