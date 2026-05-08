@@ -741,7 +741,7 @@ function showDetail(idx) {
       <td>${scoreDisplay(a)}</td>
       <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${a.possible || '—'}</td>
       <td>${notesDisplay(a)}</td>
-      <td><button class="btn btn-todo" onclick="addToTasks(${idx},'${encodeURIComponent(a.name)}','${a.due}')">+ task</button></td>
+      <td><button class="btn btn-todo" onclick="addToTasks(${idx},'${encodeURIComponent(a.name)}','${a.due}')">+ Task</button><button class="btn btn-ghost btn-sm" onclick="deleteAssignment(${a.ci},'${encodeURIComponent(a.name)}')" title="Remove">✕</button></td>
     </tr>`
   ).join('');
 }
@@ -803,9 +803,17 @@ function renderAssignments() {
       <td style="font-family:var(--mono);font-size:12px">${a.due}</td>
       <td>${scoreDisplay(a)}</td>
       <td>${notesDisplay(a)}</td>
-      <td><button class="btn btn-todo" onclick="addToTasks(${a.ci},'${encodeURIComponent(a.name)}','${a.due}')">+ task</button></td>
+      <td><button class="btn btn-todo" onclick="addToTasks(${a.ci},'${encodeURIComponent(a.name)}','${a.due}')">+ Task</button> <button class="btn btn-ghost btn-sm" onclick="deleteAssignment(${a.ci},'${encodeURIComponent(a.name)}')" title="Remove">✕</button></td>
     </tr>`
   ).join('');
+}
+
+function deleteAssignment(ci, encodedName) {
+  const name = decodeURIComponent(encodedName);
+  classes[ci].assignments = classes[ci].assignments.filter(a => a.name !== name);
+  save();
+  renderAssignments();
+  toast('Assignment removed');
 }
 
 // ── Tasks ────────────────────────────────────────────────────
