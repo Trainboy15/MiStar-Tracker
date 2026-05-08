@@ -423,6 +423,13 @@ body.compact .class-card { padding: 12px 14px; }
           </div>
           <div class="settings-row-right"><div class="toggle" id="toggle-showPct" onclick="toggleSetting('showPct')"></div></div>
         </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Hide letter grade on grades screen</div>
+            <div class="settings-row-desc">Hides the letter grade from beeing shown on grades section</div>
+          </div>
+          <div class="settings-row-right"><div class="toggle" id="toggle-hideGrades" onclick="toggleSetting('hideGrades')"></div></div>
+        </div>
       </div>
 
       <div class="settings-section">
@@ -712,7 +719,7 @@ function renderGrades() {
           <div class="class-card-name">Per ${c.period} · ${c.name}</div>
           <div class="class-card-meta">${c.code} · ${c.teacher}</div>
         </div>
-        <div class="grade-chip ${gradeClass(c.grade)}">${c.grade || '—'}</div>
+        ${!settings.hideGrades ? `<div class="grade-chip ${gradeClass(c.grade)}">${c.grade || '—'}</div>` : ''}
       </div>
       ${pct ? `<div class="class-card-bar-bg"><div class="class-card-bar" style="width:${barW}%"></div></div>` : ''}
       <div class="class-card-stats">
@@ -731,8 +738,8 @@ function showDetail(idx) {
   document.getElementById('detail-title').textContent = c.name;
   document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
   const chip = document.getElementById('detail-grade-chip');
-  chip.textContent = c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—';
-  chip.className = `grade-chip ${gradeClass(c.grade)}`;
+  chip.textContent = settings.hideGrades ? '' : (c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—');
+  chip.className = settings.hideGrades ? '' : `grade-chip ${gradeClass(c.grade)}`;
 
   document.getElementById('detail-tbody').innerHTML = c.assignments.map(a =>
     `<tr>
@@ -975,6 +982,7 @@ const SETTING_DEFAULTS = {
   autoPriority:  '70',
   hideCompleted: 'never',
   accentColor:   '#7c6ef4',
+  hideGrades: false,
 };
 
 let settings = { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem('mst_settings') || '{}') };
@@ -992,6 +1000,7 @@ function saveSetting(key, value) {
 
 function toggleSetting(key) {
   saveSetting(key, !settings[key]);
+  console.log(key)
   renderSettings();
 }
 
@@ -1002,14 +1011,15 @@ function applySettings() {
   document.documentElement.style.setProperty('--accent2', settings.accentColor + 'cc');
   // Compact mode
   document.body.classList.toggle('compact', !!settings.compactMode);
+  document.body.classList.toggle('hideGrades', !! settings.hideGrades);
   const favicon = document.querySelector('link[rel="icon"]');
   favicon.href = `https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=${settings.accentColor.replace('#', '')}`;
 }
 
 function renderSettings() {
   // Toggles
-  ['compact','period','showPct'].forEach(key => {
-    const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct' };
+  ['compact','period','showPct','hideGrades'].forEach(key => {
+    const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades' };
     const el = document.getElementById('toggle-' + key);
     if (el) el.classList.toggle('on', !!settings[map[key]]);
   });
