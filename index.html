@@ -734,7 +734,10 @@ function renderGrades() {
 function showDetail(idx) {
   const c = classes[idx];
   document.getElementById('grades-overview').style.display = 'none';
+  
+  document.getElementById('panel-grades').style.display = 'block';
   document.getElementById('grades-detail').style.display = 'block';
+  document.getElementById('panel-assignments').style.display = 'none'
   document.getElementById('detail-title').textContent = c.name;
   document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
   const chip = document.getElementById('detail-grade-chip');
@@ -803,16 +806,21 @@ function renderAssignments() {
   if (!all.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  tbody.innerHTML = all.map(a =>
-    `<tr>
-      <td title="${a.name}">${a.name}</td>
-      <td style="font-size:12px;color:var(--text3)">Per ${a.cls.period} · ${a.cls.name.split(' ').slice(0,3).join(' ')}</td>
-      <td style="font-family:var(--mono);font-size:12px">${a.due}</td>
-      <td>${scoreDisplay(a)}</td>
-      <td>${notesDisplay(a)}</td>
-      <td><button class="btn btn-todo" onclick="addToTasks(${a.ci},'${encodeURIComponent(a.name)}','${a.due}')">+ Task</button> <button class="btn btn-ghost btn-sm" onclick="deleteAssignment(${a.ci},'${encodeURIComponent(a.name)}')" title="Remove">✕</button></td>
-    </tr>`
-  ).join('');
+  tbody.innerHTML = all.map(a => `
+  <tr> 
+    <td title="${a.name}">
+      <a href="#" onclick="event.preventDefault(); showDetail(${a.ci})" style="color: inherit; text-decoration: underline;">
+        ${a.name}
+      </a>
+    </td> 
+    <td style="font-size:12px;color:var(--text3)">Per ${a.cls.period} · ${a.cls.name.split(' ').slice(0,3).join(' ')}</td> 
+    <td style="font-family:var(--mono);font-size:12px">${a.due}</td> 
+    <td>${scoreDisplay(a)}</td> 
+    <td>${notesDisplay(a)}</td> 
+    <td>
+  </tr>`).join('');
+
+
 }
 
 function deleteAssignment(ci, encodedName) {
