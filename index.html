@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=a99cf8" type="image/x-icon">
-<title>ROHS | Grades</title>
+<title>Gradebook | Grades</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -247,7 +247,7 @@ body.compact .class-card { padding: 12px 14px; }
 <div class="shell">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo">ROHS<br><span>Dashboard</span></div>
+    <div class="logo">Gradebook<br><span>Dashboard</span></div>
     <div class="sidebar-label">Overview</div>
     <div class="nav-item active" onclick="nav('grades')"><span class="nav-icon">◈</span> Grades</div>
     <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
@@ -360,7 +360,7 @@ body.compact .class-card { padding: 12px 14px; }
 
 
     <!-- ── Assignments ── -->
-    <div id="panel-assignments" class="panel">
+    <div id="panel-assignments" class="panel" style="display:none;">
       <div class="page-title">All Assignments</div>
       <div class="page-sub" id="assign-sub"></div>
       <div class="filter-row">
@@ -744,7 +744,8 @@ function computePct(c) {
 }
 
 function renderGrades() {
-  document.title = "ROHS | Grades";
+  document.title = "Gradebook | Grades";
+  document.getElementById("panel-assignments").style.display = 'none'
   const grid  = document.getElementById('classes-grid');
   const empty = document.getElementById('grades-empty');
   const mets  = document.getElementById('metrics');
@@ -793,10 +794,10 @@ function showDetail(idx) {
   const c = classes[idx];
   document.getElementById('grades-overview').style.display = 'none';
   document.getElementById('grades-detail').style.display = 'block';
-  document.getElementById('panel-assignments').style.display = 'none'
+  document.getElementById("panel-assignments").style.display = 'none'
   document.getElementById('detail-title').textContent = c.name;
   document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
-  document.title = `ROHS | ${c.teacher}`;
+  document.title = `Gradebook | ${c.teacher}`;
   const chip = document.getElementById('detail-grade-chip');
   chip.textContent = settings.hideGrades ? '' : (c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—');
   chip.className = settings.hideGrades ? '' : `grade-chip ${gradeClass(c.grade)}`;
@@ -812,13 +813,13 @@ function showDetail(idx) {
     </tr>`
     
   ).join('');
-  
+  nav('grades')
 }
 
 function closeDetail() {
-  document.title = "ROHS | Grades";
-  document.getElementById('grades-overview').style.display = '';
-  document.getElementById('panel-assignments').style.display = ''
+  document.title = "Gradebook | Grades";
+  document.getElementById('grades-overview').style.display = 'block';
+  document.getElementById("panel-assignments").style.display = 'none'
   document.getElementById('grades-detail').style.display = 'none';
 }
 
@@ -844,7 +845,8 @@ function notesDisplay(a) {
 
 // ── Assignments ──────────────────────────────────────────────
 function renderAssignments() {
-  document.title = "ROHS | Assigmeents";
+  document.title = "Gradebook | Assigmeents";
+  document.getElementById("panel-assignments").style.display = 'block'
   const search  = document.getElementById('a-search').value.toLowerCase();
   const cls     = document.getElementById('a-class').value;
   const status  = document.getElementById('a-status').value;
@@ -1017,7 +1019,8 @@ function renderAssignments() {
     }
 
 function renderTasks() {
-  document.title = "ROHS | Tasks";
+  document.getElementById("panel-assignments").style.display = 'none'
+  document.title = "Gradebook | Tasks";
   const list  = document.getElementById('tasks-list');
   const empty = document.getElementById('tasks-empty');
   if (!tasks.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
@@ -1051,7 +1054,7 @@ function renderTasks() {
 
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
-  document.title = "ROHS | Import";
+  document.title = "Gradebook | Import";
   const el = document.getElementById('imported-list');
   if (!classes.length) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` +
@@ -1114,7 +1117,8 @@ function applySettings() {
 }
 
 function renderSettings() {
-  document.title = "ROHS | Settings";
+  document.getElementById("panel-assignments").style.display = 'none'
+  document.title = "Gradebook | Settings";
   // Toggles
   ['compact','period','showPct','hideGrades'].forEach(key => {
     const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades' };
