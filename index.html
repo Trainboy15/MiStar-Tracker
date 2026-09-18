@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=a99cf8" type="image/x-icon">
-<title>MiStar Tracker</title>
+<title>ROHS | Grades</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -131,6 +131,50 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .form-group textarea { resize: vertical; min-height: 70px; }
 .form-span { grid-column: 1 / -1; }
 .form-actions { display: flex; gap: 8px; margin-top: 4px; }
+/* Modal Backdrop (covers the whole screen, hidden by default) */
+.modal-backdrop {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Content Box */
+.modal-content {
+  background-color: var(--bg4);
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px; /* Adjust width as preferred */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Close "X" Button */
+.modal-close {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+.modal-close:hover {
+  color: #000;
+}
+
+/* Simple animation for appearance */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ─── Task list ─── */
 .task-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; transition: border-color 0.15s; }
@@ -203,7 +247,7 @@ body.compact .class-card { padding: 12px 14px; }
 <div class="shell">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo">MiStar<br><span>Tracker</span></div>
+    <div class="logo">ROHS<br><span>Dashboard</span></div>
     <div class="sidebar-label">Overview</div>
     <div class="nav-item active" onclick="nav('grades')"><span class="nav-icon">◈</span> Grades</div>
     <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
@@ -256,44 +300,63 @@ body.compact .class-card { padding: 12px 14px; }
       </div>
     </div>
 
-    <!-- ── Tasks ── -->
-    <div id="panel-tasks" class="panel">
-      <div class="page-title">Tasks</div>
-      <div class="page-sub">Build tasks manually or add from assignments</div>
+          <!-- ── Tasks ── -->
+      <div id="panel-tasks" class="panel">
+        <div class="page-title">Tasks</div>
+        <div class="page-sub">Build tasks manually or add from assignments</div>
+      
+        <!-- Trigger button to open the modal -->
+        <button class="btn btn-primary" onclick="openTaskModal()" style="margin-bottom: 20px;">
+          + New Task
+        </button>
+      
+        <!-- The Modal Backdrop Container -->
+        <div id="task-modal" class="modal-backdrop" onclick="closeTaskModalOnBackdrop(event)">
+          <!-- The Modal Content Box -->
+          <div class="task-builder modal-content">
+            <span class="modal-close" onclick="closeTaskModal()">&times;</span>
+            <h3>New Task</h3>
 
-      <div class="task-builder">
-        <h3>+ New Task</h3>
-        <div class="form-grid">
-          <div class="form-group form-span">
-            <label>Title</label>
-            <input type="text" id="t-title" placeholder="e.g. Study for Unit 3 Test">
-          </div>
-          <div class="form-group">
-            <label>Class</label>
-            <select id="t-class"><option value="">— Any —</option></select>
-          </div>
-          <div class="form-group">
-            <label>Priority</label>
-            <select id="t-priority">
-              <option value="high">High</option>
-              <option value="medium" selected>Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Due date</label>
-            <input type="date" id="t-due">
-          </div>
-          <div class="form-group form-span">
-            <label>Notes (optional)</label>
-            <textarea id="t-notes" placeholder="Any extra details…"></textarea>
+            <div class="form-grid">
+              <div class="form-group form-span">
+                <label>Title</label>
+                <input type="text" id="t-title" placeholder="e.g. Study for Unit 3 Test">
+              </div>
+              <div class="form-group">
+                <label>Class</label>
+                <select id="t-class"><option value="">— Any —</option></select>
+              </div>
+              <div class="form-group">
+                <label>Priority</label>
+                <select id="t-priority">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Due date</label>
+                <input type="date" id="t-due">
+              </div>
+              <div class="form-group form-span">
+                <label>Notes (optional)</label>
+                <textarea id="t-notes" placeholder="Any extra details…"></textarea>
+              </div>
+            </div>
+            <div class="form-actions" style="margin-top:12px;">
+              <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+              <button class="btn" onclick="clearTaskForm()">Clear</button>
+            </div>
           </div>
         </div>
-        <div class="form-actions" style="margin-top:12px;">
-          <button class="btn btn-primary" onclick="addTask()">Add Task</button>
-          <button class="btn" onclick="clearTaskForm()">Clear</button>
+      
+        <div id="tasks-empty" class="empty" style="display:none">
+          <strong>No tasks yet</strong>
+          <p>Build one above, or use "+ Add to tasks" on any assignment</p>
         </div>
+        <div id="tasks-list"></div>
       </div>
+
 
       <div id="tasks-empty" class="empty" style="display:none">
         <strong>No tasks yet</strong>
@@ -687,6 +750,7 @@ function computePct(c) {
 }
 
 function renderGrades() {
+  document.title = "ROHS | Grades";
   const grid  = document.getElementById('classes-grid');
   const empty = document.getElementById('grades-empty');
   const mets  = document.getElementById('metrics');
@@ -734,12 +798,11 @@ function renderGrades() {
 function showDetail(idx) {
   const c = classes[idx];
   document.getElementById('grades-overview').style.display = 'none';
-  
-  document.getElementById('panel-grades').style.display = 'block';
   document.getElementById('grades-detail').style.display = 'block';
   document.getElementById('panel-assignments').style.display = 'none'
   document.getElementById('detail-title').textContent = c.name;
   document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
+  document.title = `ROHS | ${c.teacher}`;
   const chip = document.getElementById('detail-grade-chip');
   chip.textContent = settings.hideGrades ? '' : (c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—');
   chip.className = settings.hideGrades ? '' : `grade-chip ${gradeClass(c.grade)}`;
@@ -757,7 +820,9 @@ function showDetail(idx) {
 }
 
 function closeDetail() {
+  document.title = "ROHS | Grades";
   document.getElementById('grades-overview').style.display = '';
+  document.getElementById('panel-assignments').style.display = ''
   document.getElementById('grades-detail').style.display = 'none';
 }
 
@@ -783,6 +848,7 @@ function notesDisplay(a) {
 
 // ── Assignments ──────────────────────────────────────────────
 function renderAssignments() {
+  document.title = "ROHS | Assigmeents";
   const search  = document.getElementById('a-search').value.toLowerCase();
   const cls     = document.getElementById('a-class').value;
   const status  = document.getElementById('a-status').value;
@@ -800,136 +866,162 @@ function renderAssignments() {
   if (status === 'low')      all = all.filter(a => a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7);
   if (search) all = all.filter(a => a.name.toLowerCase().includes(search) || a.cls.name.toLowerCase().includes(search));
 
-  all.sort((a, b) => new Date(b.due) - new Date(a.due));
-  sub.textContent = `${all.length} assignment${all.length !== 1 ? 's' : ''}`;
+      all.sort((a, b) => new Date(b.due) - new Date(a.due));
+      sub.textContent = `${all.length} assignment${all.length !== 1 ? 's' : ''}`;
 
-  if (!all.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
+      if (!all.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
 
-  tbody.innerHTML = all.map(a => `
-  <tr> 
-    <td title="${a.name}">
-      <a href="#" onclick="event.preventDefault(); showDetail(${a.ci})" style="color: inherit; text-decoration: underline;">
-        ${a.name}
-      </a>
-    </td> 
-    <td style="font-size:12px;color:var(--text3)">Per ${a.cls.period} · ${a.cls.name.split(' ').slice(0,3).join(' ')}</td> 
-    <td style="font-family:var(--mono);font-size:12px">${a.due}</td> 
-    <td>${scoreDisplay(a)}</td> 
-    <td>${notesDisplay(a)}</td> 
-    <td>
-  </tr>`).join('');
+      tbody.innerHTML = all.map(a => `
+      <tr> 
+        <td title="${a.name}">
+          <a href="#" onclick="event.preventDefault(); showDetail(${a.ci})" style="color: inherit; text-decoration: underline;">
+            ${a.name}
+          </a>
+        </td> 
+        <td style="font-size:12px;color:var(--text3)">Per ${a.cls.period} · ${a.cls.name.split(' ').slice(0,3).join(' ')}</td> 
+        <td style="font-family:var(--mono);font-size:12px">${a.due}</td> 
+        <td>${scoreDisplay(a)}</td> 
+        <td>${notesDisplay(a)}</td> 
+        <td>
+      </tr>`).join('');
+    
+    
+    }
 
+    function deleteAssignment(ci, encodedName) {
+      const name = decodeURIComponent(encodedName);
+      classes[ci].assignments = classes[ci].assignments.filter(a => a.name !== name);
+      save();
+      renderAssignments();
+      toast('Assignment removed');
+    }
 
-}
+    // Global tracking variable to know if we are creating or editing
+    let currentEditingTaskId = null;
 
-function deleteAssignment(ci, encodedName) {
-  const name = decodeURIComponent(encodedName);
-  classes[ci].assignments = classes[ci].assignments.filter(a => a.name !== name);
-  save();
-  renderAssignments();
-  toast('Assignment removed');
-}
+    // Modal UI Control Utilities
+    function openTaskModal() {
+      document.getElementById('task-modal').style.display = 'flex';
+    }
 
-// ── Tasks ────────────────────────────────────────────────────
-function addToTasks(classIdx, encodedName, due) {
-  const name = decodeURIComponent(encodedName);
-  const c = classes[classIdx];
-  // Auto-detect priority: pending = high, low score = medium, else low
-  const a = c.assignments.find(x => x.name === name);
-  let priority = 'low';
-  if (a) {
-    if (a.notGraded) priority = 'high';
-    else if (a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7) priority = 'medium';
-  }
-  const exists = tasks.find(t => t.title === name && t.classCode === c.code);
-  if (exists) { toast(`"${name}" is already in tasks`); return; }
-  tasks.push({ id: Date.now(), title: name, classCode: c.code, priority, due, notes: '', completed: false });
-  save();
-  toast(`Added "${name.slice(0,30)}…" to tasks`);
-}
+    function closeTaskModal() {
+      document.getElementById('task-modal').style.display = 'none';
+      clearTaskForm(); // Clean up state when closing
+    }
 
-function addTask() {
-  const title = document.getElementById('t-title').value.trim();
-  if (!title) { toast('Enter a title', false); return; }
-  tasks.push({
-    id: Date.now(),
-    title,
-    classCode: document.getElementById('t-class').value,
-    priority:  document.getElementById('t-priority').value,
-    due:       document.getElementById('t-due').value,
-    notes:     document.getElementById('t-notes').value.trim(),
-    completed: false
-  });
-  save();
-  clearTaskForm();
-  renderTasks();
-  toast('Task added');
-}
+    function closeTaskModalOnBackdrop(event) {
+      if (event.target.id === 'task-modal') {
+        closeTaskModal();
+      }
+    }
 
-function clearTaskForm() {
-  ['t-title','t-due','t-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('t-class').value = '';
-  document.getElementById('t-priority').value = 'medium';
-}
+    // ── Refactored Tasks Code ────────────────────────────────────────────────────
 
-function toggleTask(id) {
-  const t = tasks.find(x => x.id === id);
-  if (t) { t.completed = !t.completed; save(); renderTasks(); }
-}
+    function addTask() {
+      const title = document.getElementById('t-title').value.trim();
+      if (!title) { toast('Enter a title', false); return; }
+    
+      if (currentEditingTaskId !== null) {
+        // ── Saving an existing task (Editing Mode) ──
+        const t = tasks.find(x => x.id === currentEditingTaskId);
+        if (t) {
+          t.title     = title;
+          t.classCode = document.getElementById('t-class').value;
+          t.priority  = document.getElementById('t-priority').value;
+          t.due       = document.getElementById('t-due').value;
+          t.notes     = document.getElementById('t-notes').value.trim();
+          toast('Task updated');
+        }
+      } else {
+        // ── Adding a brand new task (Creation Mode) ──
+        tasks.push({
+          id: Date.now(),
+          title,
+          classCode: document.getElementById('t-class').value,
+          priority:  document.getElementById('t-priority').value,
+          due:       document.getElementById('t-due').value,
+          notes:     document.getElementById('t-notes').value.trim(),
+          completed: false
+        });
+        toast('Task added');
+      }
+    
+      save();
+      closeTaskModal(); // Closes the modal AND clears the form automatically
+      renderTasks();
+    }
 
-function deleteTask(id) {
-  tasks = tasks.filter(x => x.id !== id);
-  save(); renderTasks();
-}
-function editTask(id) {
-  const t = tasks.find(x => x.id === id);
-  if (!t) return;
+    function clearTaskForm() {
+      // Clear modal inputs
+      ['t-title','t-due','t-notes'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('t-class').value = '';
+      document.getElementById('t-priority').value = 'medium';
 
-  const row = document.getElementById('task-row-' + id);
-  if (!row) return;
+      // Reset heading and tracker to creation defaults
+      currentEditingTaskId = null;
+      const heading = document.querySelector('.task-builder h3');
+      if (heading) heading.textContent = '+ New Task';
 
-  const classOptions = classes.map(c =>
-    `<option value="${c.code}" ${t.classCode === c.code ? 'selected' : ''}>Per ${c.period}: ${c.name}</option>`
-  ).join('');
+      const submitBtn = document.querySelector('.task-builder .btn-primary');
+      if (submitBtn) submitBtn.textContent = 'Add Task';
+    }
 
-  row.innerHTML = `
-    <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:4px 0;">
-      <input id="e-title-${id}" style="grid-column:1/-1; font-family:var(--font); font-size:13px; padding:7px 10px; background:var(--bg3); border:1px solid var(--accent); border-radius:var(--radius-sm); color:var(--text);" value="${t.title.replace(/"/g,'&quot;')}">
-      <select id="e-class-${id}" style="font-family:var(--font); font-size:12px; padding:6px 8px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);">
-        <option value="">— Any —</option>${classOptions}
-      </select>
-      <select id="e-priority-${id}" style="font-family:var(--font); font-size:12px; padding:6px 8px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);">
-        <option value="high" ${t.priority==='high'?'selected':''}>High</option>
-        <option value="medium" ${t.priority==='medium'?'selected':''}>Medium</option>
-        <option value="low" ${t.priority==='low'?'selected':''}>Low</option>
-      </select>
-      <input id="e-due-${id}" type="date" value="${t.due||''}" style="font-family:var(--mono); font-size:12px; padding:6px 8px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);">
-      <textarea id="e-notes-${id}" rows="2" placeholder="Notes…" style="grid-column:1/-1; font-family:var(--font); font-size:12px; padding:7px 10px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); resize:vertical;">${t.notes||''}</textarea>
-      <div style="grid-column:1/-1; display:flex; gap:6px;">
-        <button class="btn btn-primary btn-sm" onclick="saveTask(${id})">Save</button>
-        <button class="btn btn-sm" onclick="renderTasks()">Cancel</button>
-      </div>
-    </div>
-    <button class="btn btn-ghost btn-sm" onclick="deleteTask(${id})" title="Delete">✕</button>`;
-}
+    function editTask(id) {
+      const t = tasks.find(x => x.id === id);
+      if (!t) return;
+    
+      // Track the ID we are currently modifying
+      currentEditingTaskId = id;
+    
+      // Change the modal interface titles to look like an edit panel
+      const heading = document.querySelector('.task-builder h3');
+      if (heading) heading.textContent = 'Edit Task';
 
-function saveTask(id) {
-  const t = tasks.find(x => x.id === id);
-  if (!t) return;
-  const title = document.getElementById('e-title-' + id).value.trim();
-  if (!title) { toast('Title cannot be empty', false); return; }
-  t.title     = title;
-  t.classCode = document.getElementById('e-class-' + id).value;
-  t.priority  = document.getElementById('e-priority-' + id).value;
-  t.due       = document.getElementById('e-due-' + id).value;
-  t.notes     = document.getElementById('e-notes-' + id).value.trim();
-  save();
-  renderTasks();
-  toast('Task updated');
-}
+      const submitBtn = document.querySelector('.task-builder .btn-primary');
+      if (submitBtn) submitBtn.textContent = 'Save Changes';
+    
+      // Fill the modal form fields with existing data
+      document.getElementById('t-title').value = t.title;
+      document.getElementById('t-class').value = t.classCode;
+      document.getElementById('t-priority').value = t.priority;
+      document.getElementById('t-due').value = t.due || '';
+      document.getElementById('t-notes').value = t.notes || '';
+    
+      // Pop open the modal
+      openTaskModal();
+    }
+
+    // Keeping your original baseline logic intact 
+    function addToTasks(classIdx, encodedName, due) {
+      const name = decodeURIComponent(encodedName);
+      const c = classes[classIdx];
+      const a = c.assignments.find(x => x.name === name);
+      let priority = 'low';
+      if (a) {
+        if (a.notGraded) priority = 'high';
+        else if (a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7) priority = 'medium';
+      }
+      const exists = tasks.find(t => t.title === name && t.classCode === c.code);
+      if (exists) { toast(`"${name}" is already in tasks`); return; }
+      tasks.push({ id: Date.now(), title: name, classCode: c.code, priority, due, notes: '', completed: false });
+      save();
+      renderTasks(); // Ensure list renders if added contextually
+      toast(`Added "${name.slice(0,30)}…" to tasks`);
+    }
+
+    function toggleTask(id) {
+      const t = tasks.find(x => x.id === id);
+      if (t) { t.completed = !t.completed; save(); renderTasks(); }
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(x => x.id !== id);
+      save(); renderTasks();
+    }
 
 function renderTasks() {
+  document.title = "ROHS | Tasks";
   const list  = document.getElementById('tasks-list');
   const empty = document.getElementById('tasks-empty');
   if (!tasks.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
@@ -963,6 +1055,7 @@ function renderTasks() {
 
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
+  document.title = "ROHS | Import";
   const el = document.getElementById('imported-list');
   if (!classes.length) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` +
@@ -1025,6 +1118,7 @@ function applySettings() {
 }
 
 function renderSettings() {
+  document.title = "ROHS | Settings";
   // Toggles
   ['compact','period','showPct','hideGrades'].forEach(key => {
     const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades' };
