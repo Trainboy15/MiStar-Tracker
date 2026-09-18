@@ -1079,6 +1079,7 @@ function renderTasks() {
 
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
+  document.getElementById("panel-assignments").style.display = 'none'
   document.title = "Gradebook | Import";
   const el = document.getElementById('imported-list');
   if (!classes.length) { el.innerHTML = ''; return; }
