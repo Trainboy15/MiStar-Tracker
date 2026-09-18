@@ -358,12 +358,6 @@ body.compact .class-card { padding: 12px 14px; }
       </div>
 
 
-      <div id="tasks-empty" class="empty" style="display:none">
-        <strong>No tasks yet</strong>
-        <p>Build one above, or use "+ Add to tasks" on any assignment</p>
-      </div>
-      <div id="tasks-list"></div>
-    </div>
 
     <!-- ── Assignments ── -->
     <div id="panel-assignments" class="panel">
@@ -776,7 +770,7 @@ function renderGrades() {
   grid.innerHTML = classes.map((c, i) => {
     const pct = computePct(c);
     const ng = c.assignments.filter(a => a.notGraded).length;
-    const barW = pct ? Math.min(parseFloat(pct), 100) : 0;
+    const barW = pct ? Math.min(parseFloat(c.gradePct), 100) : 0;
     return `<div class="class-card" onclick="showDetail(${i})">
       <div class="class-card-top">
         <div>
@@ -787,7 +781,7 @@ function renderGrades() {
       </div>
       ${pct ? `<div class="class-card-bar-bg"><div class="class-card-bar" style="width:${barW}%"></div></div>` : ''}
       <div class="class-card-stats">
-        <div class="cs">Score: <span>${pct !== null ? pct+'%' : '—'}</span></div>
+        <div class="cs">Score: <span>${c.gradePct !== null ? c.gradePct+'%' : '—'}</span></div>
         <div class="cs">Items: <span>${c.assignments.length}</span></div>
         ${ng > 0 ? `<div class="cs" style="color:var(--yellow)">Pending: <span style="color:var(--yellow)">${ng}</span></div>` : ''}
       </div>
@@ -814,9 +808,11 @@ function showDetail(idx) {
       <td>${scoreDisplay(a)}</td>
       <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${a.possible || '—'}</td>
       <td>${notesDisplay(a)}</td>
-      <td><button class="btn btn-todo" onclick="addToTasks(${idx},'${encodeURIComponent(a.name)}','${a.due}')">+ Task</button><button class="btn btn-ghost btn-sm" onclick="deleteAssignment(${a.ci},'${encodeURIComponent(a.name)}')" title="Remove">✕</button></td>
+      <td><button class="btn btn-todo" onclick="addToTasks(${idx},'${encodeURIComponent(a.name)}','${Date.now()}')">+ Task</button><button class="btn btn-ghost btn-sm" onclick="deleteAssignment(${a.ci},'${encodeURIComponent(a.name)}')" title="Remove">✕</button></td>
     </tr>`
+    
   ).join('');
+  
 }
 
 function closeDetail() {
