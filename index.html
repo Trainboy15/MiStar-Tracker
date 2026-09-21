@@ -244,25 +244,74 @@ body.compact .metric-val { font-size: 20px; }
 body.compact .class-card { padding: 12px 14px; }
 
 /* ─── Calendar ─── */
-.calendar-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.calendar-wrap { 
+  background: var(--bg2); 
+  border: 1px solid var(--border); 
+  border-radius: var(--radius); 
+  padding: 14px; 
+}
+
 .calendar-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .calendar-month-label { font-size: 16px; font-weight: 600; color: var(--text); }
 .calendar-controls { display: flex; gap: 8px; flex-wrap: wrap; }
 .calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .calendar-weekdays { margin-bottom: 6px; }
 .calendar-weekday { text-align: center; font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 6px 0; }
-.calendar-day { min-height: 108px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; color: var(--text); text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s, background 0.15s; }
+
+.calendar-day { 
+  position: relative; /* Required to absolute position the + button inside */
+  min-height: 108px; 
+  background: var(--bg3); 
+  border: 1px solid var(--border); 
+  border-radius: var(--radius-sm); 
+  padding: 8px; 
+  color: var(--text); 
+  text-align: left; 
+  cursor: pointer; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 6px; 
+  transition: border-color 0.15s, background 0.15s; 
+}
 .calendar-day:hover, .calendar-day:focus-visible { border-color: var(--accent); outline: none; }
 .calendar-day.outside { opacity: 0.42; cursor: default; }
 .calendar-day-number { font-size: 12px; font-family: var(--mono); color: var(--text2); }
+
+/* --- NEW / FIXED NEW TASK STYLES --- */
+.calendar-day-newtask {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 14px;
+  font-family: var(--mono);
+  color: var(--text3);
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.15s ease;
+  pointer-events: auto; /* Ensures it can be clicked */
+}
+
+/* Show the + when hovering or focusing the day card */
+.calendar-day:hover .calendar-day-newtask,
+.calendar-day:focus-within .calendar-day-newtask {
+  opacity: 1;
+}
+
+.calendar-day-newtask:hover { 
+  color: var(--accent); 
+}
+/* ----------------------------------- */
+
 .calendar-day.today .calendar-day-number { color: var(--accent2); font-weight: 700; }
 .calendar-events { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .calendar-event-item { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(124,110,244,0.12); border: 1px solid rgba(124,110,244,0.35); border-radius: 4px; padding: 2px 5px; }
+.calendar-event-item:hover { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(180, 173, 240, 0.12); border: 1px solid rgba(124,110,244,0.35); border-radius: 4px; padding: 2px 5px; }
 .calendar-more { font-size: 11px; color: var(--text3); }
+.calendar-more:hover { font-size: 11px; color: var(--text2); }
 .calendar-modal-content { max-width: 540px; border: 1px solid var(--border2); }
 .calendar-modal-close { background: transparent; border: none; color: var(--text3); line-height: 1; }
 .calendar-modal-close:hover { color: var(--text); }
 .calendar-selected-date { font-size: 12px; color: var(--text3); margin: 4px 0 14px; font-family: var(--mono); }
+
 
 @media (max-width: 700px) {
   .calendar-day { min-height: 84px; padding: 6px; }
@@ -278,7 +327,10 @@ body.compact .class-card { padding: 12px 14px; }
     <div class="sidebar-label">Overview</div>
     <div class="nav-item active" onclick="nav('grades'); closeDetail();"><span class="nav-icon">◈</span> Grades</div>
     <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
-    <div class="nav-item" onclick="nav('calendar')"><span class="nav-icon">🗓</span> Calendar</div>
+    <div class="nav-item" onclick="nav('calendar')"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5h16V4H0V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+</svg>
+</span> Calendar</div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Data</div>
     <div class="nav-item" onclick="nav('assignments')"><span class="nav-icon">🗐</span> Assignments</div>
@@ -636,7 +688,7 @@ body.compact .class-card { padding: 12px 14px; }
 <div id="calendar-modal" class="modal-backdrop" onclick="closeCalendarModalOnBackdrop(event)" aria-hidden="true">
   <div class="modal-content calendar-modal-content" role="dialog" aria-modal="true" aria-labelledby="calendar-modal-title">
     <button type="button" class="modal-close calendar-modal-close" onclick="closeCalendarModal()" aria-label="Close dialog">&times;</button>
-    <h3 id="calendar-modal-title">Add Event</h3>
+    <h3 id="calendar-modal-title">New Event</h3>
     <p id="calendar-selected-date" class="calendar-selected-date"></p>
     <div class="form-grid">
       <div class="form-group form-span">
@@ -651,6 +703,7 @@ body.compact .class-card { padding: 12px 14px; }
     <div class="form-actions" style="margin-top:12px;">
       <button class="btn btn-primary" onclick="saveCalendarEvent()">Save Event</button>
       <button class="btn" onclick="closeCalendarModal()">Cancel</button>
+      <button class="btn btn-ghost" id="delete-event" style="color:var(--red);border-color:rgba(248,113,113,0.3);display: none;" onclick="deleteCalendarEvent()">Delete</button>
     </div>
   </div>
 </div>
@@ -1206,22 +1259,42 @@ function renderCalendar() {
     cells.push('<div class="calendar-day outside" aria-hidden="true"></div>');
   }
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const key = calendarDateKey(year, month, day);
-    const events = Array.isArray(calendarEvents[key]) ? calendarEvents[key] : [];
-    const isToday = isCurrentMonth && today.getDate() === day;
-    const preview = events.slice(0, 2).map(e => {
-      const safeTitle = escapeHtml(e.title);
-      return `<div class="calendar-event-item" title="${safeTitle}">${safeTitle}</div>`;
-    }).join('');
-    const more = events.length > 2 ? `<div class="calendar-more">+${events.length - 2} more</div>` : '';
-    cells.push(`
-      <button class="calendar-day ${isToday ? 'today' : ''}" onclick="openCalendarModal('${key}')" aria-label="Open events for ${formatCalendarDateDisplay(key)}">
-        <span class="calendar-day-number">${day}</span>
-        <div class="calendar-events">${preview}${more}</div>
-      </button>
-    `);
-  }
+// Track whether we are editing an event, and which index it is at
+let editingEventIndex = null; 
+
+// Modified Loop Section (Update this part inside your renderCalendar loop)
+for (let day = 1; day <= daysInMonth; day++) {
+  const key = calendarDateKey(year, month, day);
+  const events = Array.isArray(calendarEvents[key]) ? calendarEvents[key] : [];
+  const isToday = isCurrentMonth && today.getDate() === day;
+
+  // Pass the item index (i) into the edit modal function
+  const preview = events.slice(0, 2).map((e, i) => {
+    const safeTitle = escapeHtml(e.title);
+    return `<div class="calendar-event-item" title="${safeTitle}" role="button" tabindex="0" onclick="event.stopPropagation(); openEventModal('${key}', ${i})">${safeTitle}</div>`;
+  }).join('');
+
+  const more = events.length > 2 ? `<div class="calendar-more">+${events.length - 2} more</div>` : '';
+
+  cells.push(`
+    <div class="calendar-day ${isToday ? 'today' : ''}" 
+         tabindex="0"
+         onclick="openCalendarModal('${key}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){ event.preventDefault(); openCalendarModal('${key}'); }"
+         aria-label="Open events for ${formatCalendarDateDisplay(key)}">
+      <span class="calendar-day-number">${day}</span>
+      
+      <span class="calendar-day-newtask" 
+            role="button" 
+            tabindex="0"
+            aria-label="Add new task"
+            onclick="event.stopPropagation(); openCalendarModal('${key}')"
+            onkeydown="event.stopPropagation(); if(event.key==='Enter'||event.key===' '){ event.preventDefault(); openCalendarModal('${key}'); }">＋</span>
+            
+      <div class="calendar-events">${preview}${more}</div>
+    </div>
+  `);
+}
 
   grid.innerHTML = cells.join('');
 }
@@ -1237,29 +1310,85 @@ function goToToday() {
   renderCalendar();
 }
 
+// Opens the form to save a brand new event
 function openCalendarModal(key) {
   selectedCalendarDate = key;
+  editingEventIndex = null; // Clear out index because this is a NEW event
   calendarLastFocusedElement = document.activeElement;
+  
   const modal = document.getElementById('calendar-modal');
-  const dateText = document.getElementById('calendar-selected-date');
+  const modalTitle = document.getElementById('calendar-modal-title');
   const titleInput = document.getElementById('calendar-event-title');
   const detailsInput = document.getElementById('calendar-event-details');
-  dateText.textContent = formatCalendarDateDisplay(key);
+  const deleteEvent = document.getElementById('delete-event');
+  if(!modal || !titleInput || !detailsInput) return;
+  
+  modalTitle.textContent = 'New Task';
   titleInput.value = '';
   detailsInput.value = '';
+  deleteEvent.style.display = 'none';
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden', 'false');
   titleInput.focus();
 }
 
+
+// Opens the form with existing data populated for editing
+function openEventModal(key, index) {
+  selectedCalendarDate = key;
+  editingEventIndex = index; // Store the exact index of the event we are changing
+  calendarLastFocusedElement = document.activeElement;
+  
+  const modal = document.getElementById('calendar-modal');
+  const modalTitle = document.getElementById('calendar-modal-title');
+  const titleInput = document.getElementById('calendar-event-title');
+  const detailsInput = document.getElementById('calendar-event-details');
+  const deleteEvent = document.getElementById('delete-event');
+  if(!modal || !titleInput || !detailsInput) return;
+
+  // Retrieve the target item details using the array index
+  const dayEvents = calendarEvents[key] || [];
+  const foundEvent = dayEvents[index];
+  if (!foundEvent) return;
+
+  modalTitle.textContent = 'Edit Task';
+  titleInput.value = foundEvent.title;
+  detailsInput.value = foundEvent.details || '';
+  deleteEvent.style.display = '';
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
+  titleInput.focus();
+}
+
+function deleteCalendarEvent() {
+  // Guard check to make sure a date and specific event index are active
+  if (!selectedCalendarDate || editingEventIndex === null) return;
+  
+  const dayEvents = calendarEvents[selectedCalendarDate];
+  if (!Array.isArray(dayEvents)) return;
+
+  // Remove the specific item from the array using its index position
+  dayEvents.splice(editingEventIndex, 1);
+
+  // Clean up: If no events are left on this date, delete the key entirely
+  if (dayEvents.length === 0) {
+    delete calendarEvents[selectedCalendarDate];
+  }
+
+  save();              // Sync changes to your global storage utility
+  closeCalendarModal(); // Close the active window view
+  renderCalendar();     // Force a UI repaint to reflect changes on the grid
+  toast('Event deleted');
+}
+
+
 function closeCalendarModal() {
   const modal = document.getElementById('calendar-modal');
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
-  selectedCalendarDate = null;
-  if (calendarLastFocusedElement && typeof calendarLastFocusedElement.focus === 'function') {
-    calendarLastFocusedElement.focus();
+  if (modal) {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
   }
+  selectedCalendarDate = null;
 }
 
 function closeCalendarModalOnBackdrop(event) {
@@ -1268,20 +1397,32 @@ function closeCalendarModalOnBackdrop(event) {
   }
 }
 
+// Saves either the brand new event or overrides the edited index entry
 function saveCalendarEvent() {
   if (!selectedCalendarDate) return;
   const title = document.getElementById('calendar-event-title').value.trim();
   const details = document.getElementById('calendar-event-details').value.trim();
   if (!title) { toast('Enter an event title', false); return; }
+  
   if (!Array.isArray(calendarEvents[selectedCalendarDate])) {
     calendarEvents[selectedCalendarDate] = [];
   }
-  calendarEvents[selectedCalendarDate].push({ title, details });
+  
+  if (editingEventIndex !== null) {
+    // We are editing an existing item, overwrite it at its index position
+    calendarEvents[selectedCalendarDate][editingEventIndex] = { title, details };
+    toast('Event updated');
+  } else {
+    // We are adding a fresh item
+    calendarEvents[selectedCalendarDate].push({ title, details });
+    toast('Event saved');
+  }
+
   save();
   closeCalendarModal();
   renderCalendar();
-  toast('Event saved');
 }
+
 
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
