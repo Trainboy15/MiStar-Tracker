@@ -1823,10 +1823,6 @@ renderUpdateAvailability();
 ensureCalendarWeekdays();
 renderGrades();
 checkForUpdates({ manual: false });
-setInterval(() => checkForUpdates({ manual: false }), 30 * 60 * 1000);
-window.addEventListener('focus', () => {
-  if (updateState.updateAvailable && !hasUnsavedWork()) applyUpdateNow(true);
-});
 fetch("https://mistar.oakland.k12.mi.us/royaloak/StudentPortal/Home/Login", {
   "headers": {
     "accept": "*/*",
