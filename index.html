@@ -242,6 +242,32 @@ body.compact .task-item { padding: 10px 12px; }
 body.compact .metric { padding: 12px 14px; }
 body.compact .metric-val { font-size: 20px; }
 body.compact .class-card { padding: 12px 14px; }
+
+/* ─── Calendar ─── */
+.calendar-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.calendar-month-label { font-size: 16px; font-weight: 600; color: var(--text); }
+.calendar-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.calendar-weekdays { margin-bottom: 6px; }
+.calendar-weekday { text-align: center; font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 6px 0; }
+.calendar-day { min-height: 108px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; color: var(--text); text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s, background 0.15s; }
+.calendar-day:hover, .calendar-day:focus-visible { border-color: var(--accent); outline: none; }
+.calendar-day.outside { opacity: 0.42; cursor: default; }
+.calendar-day-number { font-size: 12px; font-family: var(--mono); color: var(--text2); }
+.calendar-day.today .calendar-day-number { color: var(--accent2); font-weight: 700; }
+.calendar-events { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.calendar-event-item { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(124,110,244,0.12); border: 1px solid rgba(124,110,244,0.35); border-radius: 4px; padding: 2px 5px; }
+.calendar-more { font-size: 11px; color: var(--text3); }
+.calendar-modal-content { max-width: 540px; border: 1px solid var(--border2); }
+.calendar-modal-close { background: transparent; border: none; color: var(--text3); line-height: 1; }
+.calendar-modal-close:hover { color: var(--text); }
+.calendar-selected-date { font-size: 12px; color: var(--text3); margin: 4px 0 14px; font-family: var(--mono); }
+
+@media (max-width: 700px) {
+  .calendar-day { min-height: 84px; padding: 6px; }
+  .calendar-event-item { font-size: 10px; }
+}
 </style>
 </head>
 <body>
@@ -252,6 +278,7 @@ body.compact .class-card { padding: 12px 14px; }
     <div class="sidebar-label">Overview</div>
     <div class="nav-item active" onclick="nav('grades'); closeDetail();"><span class="nav-icon">◈</span> Grades</div>
     <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
+    <div class="nav-item" onclick="nav('calendar')"><span class="nav-icon">🗓</span> Calendar</div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Data</div>
     <div class="nav-item" onclick="nav('assignments')"><span class="nav-icon">🗐</span> Assignments</div>
@@ -356,6 +383,24 @@ body.compact .class-card { padding: 12px 14px; }
           <p>Build one above, or use "+ Add to tasks" on any assignment</p>
         </div>
         <div id="tasks-list"></div>
+      </div>
+
+      <!-- ── Calendar ── -->
+      <div id="panel-calendar" class="panel">
+        <div class="page-title">Calendar</div>
+        <div class="page-sub">Click any day to add events</div>
+        <div class="calendar-wrap">
+          <div class="calendar-header">
+            <div id="calendar-month-label" class="calendar-month-label"></div>
+            <div class="calendar-controls">
+              <button class="btn btn-sm" onclick="changeCalendarMonth(-1)">← Prev</button>
+              <button class="btn btn-sm" onclick="goToToday()">Today</button>
+              <button class="btn btn-sm" onclick="changeCalendarMonth(1)">Next →</button>
+            </div>
+          </div>
+          <div class="calendar-weekdays" id="calendar-weekdays"></div>
+          <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
       </div>
 
 
@@ -588,13 +633,41 @@ body.compact .class-card { padding: 12px 14px; }
 
 <div id="toast" class="toast"></div>
 
+<div id="calendar-modal" class="modal-backdrop" onclick="closeCalendarModalOnBackdrop(event)" aria-hidden="true">
+  <div class="modal-content calendar-modal-content" role="dialog" aria-modal="true" aria-labelledby="calendar-modal-title">
+    <button type="button" class="modal-close calendar-modal-close" onclick="closeCalendarModal()" aria-label="Close dialog">&times;</button>
+    <h3 id="calendar-modal-title">Add Event</h3>
+    <p id="calendar-selected-date" class="calendar-selected-date"></p>
+    <div class="form-grid">
+      <div class="form-group form-span">
+        <label for="calendar-event-title">Event title</label>
+        <input type="text" id="calendar-event-title" placeholder="e.g. Quiz review">
+      </div>
+      <div class="form-group form-span">
+        <label for="calendar-event-details">Details (optional)</label>
+        <textarea id="calendar-event-details" placeholder="Optional notes"></textarea>
+      </div>
+    </div>
+    <div class="form-actions" style="margin-top:12px;">
+      <button class="btn btn-primary" onclick="saveCalendarEvent()">Save Event</button>
+      <button class="btn" onclick="closeCalendarModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let classes = JSON.parse(localStorage.getItem('mst_classes') || '[]');
 let tasks   = JSON.parse(localStorage.getItem('mst_tasks')   || '[]');
+let calendarEvents = JSON.parse(localStorage.getItem('mst_calendar_events') || '{}');
+let calendarViewDate = new Date();
+calendarViewDate.setDate(1);
+let selectedCalendarDate = null;
+let calendarLastFocusedElement = null;
 
 function save() {
   localStorage.setItem('mst_classes', JSON.stringify(classes));
   localStorage.setItem('mst_tasks',   JSON.stringify(tasks));
+  localStorage.setItem('mst_calendar_events', JSON.stringify(calendarEvents));
 }
 
 function toast(msg, ok = true) {
@@ -605,6 +678,15 @@ function toast(msg, ok = true) {
   el._t = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 // ── Navigation ──────────────────────────────────────────────
 function nav(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -613,6 +695,7 @@ function nav(id) {
   document.getElementById('panel-' + id).classList.add('active');
   if (id === 'grades') renderGrades();
   if (id === 'tasks') renderTasks();
+  if (id === 'calendar') renderCalendar();
   if (id === 'assignments') renderAssignments();
   if (id === 'import') renderImportedList();
   if (id === 'settings') { renderSettings(); }
@@ -1076,6 +1159,130 @@ function renderTasks() {
     (done.length   ? `<div class="tasks-section-label">Completed · ${done.length}</div>` + done.map(renderTask).join('') : '');
 }
 
+// ── Calendar ──────────────────────────────────────────────────
+function calendarDateKey(year, month, day) {
+  const y = String(year);
+  const m = String(month + 1).padStart(2, '0');
+  const d = String(day).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function formatCalendarDateDisplay(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function ensureCalendarWeekdays() {
+  const weekdayEl = document.getElementById('calendar-weekdays');
+  if (!weekdayEl || weekdayEl.childElementCount) return;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  weekdayEl.innerHTML = days.map(day => `<div class="calendar-weekday">${day}</div>`).join('');
+}
+
+function renderCalendar() {
+  document.title = "Gradebook | Calendar";
+  document.getElementById("panel-assignments").style.display = 'none';
+  ensureCalendarWeekdays();
+  const monthLabel = document.getElementById('calendar-month-label');
+  const grid = document.getElementById('calendar-grid');
+  if (!monthLabel || !grid) return;
+
+  const year = calendarViewDate.getFullYear();
+  const month = calendarViewDate.getMonth();
+  monthLabel.textContent = calendarViewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+  const cells = [];
+
+  for (let i = 0; i < firstWeekday; i++) {
+    cells.push('<div class="calendar-day outside" aria-hidden="true"></div>');
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const key = calendarDateKey(year, month, day);
+    const events = Array.isArray(calendarEvents[key]) ? calendarEvents[key] : [];
+    const isToday = isCurrentMonth && today.getDate() === day;
+    const preview = events.slice(0, 2).map(e => {
+      const safeTitle = escapeHtml(e.title);
+      return `<div class="calendar-event-item" title="${safeTitle}">${safeTitle}</div>`;
+    }).join('');
+    const more = events.length > 2 ? `<div class="calendar-more">+${events.length - 2} more</div>` : '';
+    cells.push(`
+      <button class="calendar-day ${isToday ? 'today' : ''}" onclick="openCalendarModal('${key}')" aria-label="Open events for ${formatCalendarDateDisplay(key)}">
+        <span class="calendar-day-number">${day}</span>
+        <div class="calendar-events">${preview}${more}</div>
+      </button>
+    `);
+  }
+
+  grid.innerHTML = cells.join('');
+}
+
+function changeCalendarMonth(delta) {
+  calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + delta, 1);
+  renderCalendar();
+}
+
+function goToToday() {
+  calendarViewDate = new Date();
+  calendarViewDate.setDate(1);
+  renderCalendar();
+}
+
+function openCalendarModal(key) {
+  selectedCalendarDate = key;
+  calendarLastFocusedElement = document.activeElement;
+  const modal = document.getElementById('calendar-modal');
+  const dateText = document.getElementById('calendar-selected-date');
+  const titleInput = document.getElementById('calendar-event-title');
+  const detailsInput = document.getElementById('calendar-event-details');
+  dateText.textContent = formatCalendarDateDisplay(key);
+  titleInput.value = '';
+  detailsInput.value = '';
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
+  titleInput.focus();
+}
+
+function closeCalendarModal() {
+  const modal = document.getElementById('calendar-modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+  selectedCalendarDate = null;
+  if (calendarLastFocusedElement && typeof calendarLastFocusedElement.focus === 'function') {
+    calendarLastFocusedElement.focus();
+  }
+}
+
+function closeCalendarModalOnBackdrop(event) {
+  if (event.target.id === 'calendar-modal') {
+    closeCalendarModal();
+  }
+}
+
+function saveCalendarEvent() {
+  if (!selectedCalendarDate) return;
+  const title = document.getElementById('calendar-event-title').value.trim();
+  const details = document.getElementById('calendar-event-details').value.trim();
+  if (!title) { toast('Enter an event title', false); return; }
+  if (!Array.isArray(calendarEvents[selectedCalendarDate])) {
+    calendarEvents[selectedCalendarDate] = [];
+  }
+  calendarEvents[selectedCalendarDate].push({ title, details });
+  save();
+  closeCalendarModal();
+  renderCalendar();
+  toast('Event saved');
+}
+
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
   document.getElementById("panel-assignments").style.display = 'none'
@@ -1248,9 +1455,16 @@ function deleteClass(i) {
   toast('Class removed');
 }
 
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && document.getElementById('calendar-modal').style.display === 'flex') {
+    closeCalendarModal();
+  }
+});
+
 // ── Init ─────────────────────────────────────────────────────
 rebuildClassSelects();
 applySettings();
+ensureCalendarWeekdays();
 renderGrades();
 fetch("https://mistar.oakland.k12.mi.us/royaloak/StudentPortal/Home/Login", {
   "headers": {
