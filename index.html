@@ -603,7 +603,7 @@ body.compact .class-card { padding: 12px 14px; }
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Hide completed tasks after</div>
-            <div class="settings-row-desc">Auto-collapse the completed section after N days</div>
+            <div class="settings-row-desc">Auto-collapse the completed section after X days</div>
           </div>
           <div class="settings-row-right">
             <select class="settings-select" id="setting-hideCompleted" onchange="saveSetting('hideCompleted', this.value)">
@@ -1593,19 +1593,39 @@ function renderUpdateAvailability() {
     label.textContent = `v${updateState.latestVersion} is ready`;
   }
 }
+async function applyUpdateNow() { // 1. Added 'async'
+    if (updateState.applying || !updateState.updateAvailable) return;
+    
+    save();
+    localStorage.setItem('mst_settings', JSON.stringify(settings));
+    writeRecoverySnapshot();
+    
+    updateState.applying = true;
+    setUpdateStatus('Applying update…');
+    toast('Applying update…');
+    
+    try {
+        // 2. Fetch the data and wait for the text content
+        const response = await fetch("https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/index.html");
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        const updateText = await response.text();
+        
+        // 3. Give the user a brief moment to see the toast message before reloading
+        setTimeout(() => {
+            // 4. Overwrite the document properly
+            document.open();
+            document.write(updateText);
+            document.close();
+        }, 1000);
 
-function applyUpdateNow() {
-  if (updateState.applying || !updateState.updateAvailable) return;
-  save();
-  localStorage.setItem('mst_settings', JSON.stringify(settings));
-  writeRecoverySnapshot();
-  updateState.applying = true;
-  setUpdateStatus('Applying update…');
-  toast('Applying update…');
-  setTimeout(() => {}, 2000);
-  const update = fetch("https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/index.html")
-  document.textContent = update
+    } catch (error) {
+        console.error("Update failed:", error);
+        toast('Update failed!');
+        updateState.applying = false;
+    }
 }
+
 
 function scheduleUpdateRetry() {
   clearTimeout(updateState.retryTimer);
