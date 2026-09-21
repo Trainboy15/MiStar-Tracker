@@ -635,6 +635,28 @@ body.compact .class-card { padding: 12px 14px; }
         </div>
       </div>
 
+      <div class="settings-section">
+        <div class="settings-section-header"><h3>Updates</h3><span>Checks for new versions from version.json</span></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Update status</div>
+            <div class="settings-row-desc" id="update-status">Not checked yet</div>
+          </div>
+          <div class="settings-row-right">
+            <button class="btn btn-sm" onclick="manualCheckForUpdates()">Check now</button>
+          </div>
+        </div>
+        <div class="settings-row" id="update-available-row" style="display:none;">
+          <div>
+            <div class="settings-row-label">Available version</div>
+            <div class="settings-row-desc" id="update-available-version"></div>
+          </div>
+          <div class="settings-row-right">
+            <button class="btn btn-sm btn-primary" onclick="applyUpdateNow()">Update now</button>
+          </div>
+        </div>
+      </div>
+
       <div class="settings-section danger-zone">
         <div class="settings-section-header"><h3>⚠ Danger zone</h3></div>
         <div class="settings-row">
@@ -664,7 +686,7 @@ body.compact .class-card { padding: 12px 14px; }
       <!-- Row 1 -->
       <div class="about-row">
         <div class="settings-row-label">Version:</div>
-        <div class="about-row-desc">0.5</div>
+        <div class="about-row-desc" id="about-version">0.6.0</div>
       </div>
     
       <!-- Row 2 -->
@@ -676,7 +698,7 @@ body.compact .class-card { padding: 12px 14px; }
       <!-- Row 3 -->
       <div class="about-row">
         <div class="settings-row-label">Release Date:</div>
-        <div class="about-row-desc">09/21/26</div>
+        <div class="about-row-desc" id="about-release-date">2026-09-21</div>
       </div>
     </div>
 
@@ -711,13 +733,41 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-let classes = JSON.parse(localStorage.getItem('mst_classes') || '[]');
-let tasks   = JSON.parse(localStorage.getItem('mst_tasks')   || '[]');
-let calendarEvents = JSON.parse(localStorage.getItem('mst_calendar_events') || '{}');
+const APP_VERSION = '0.6.0';
+const APP_RELEASE_DATE = '2026-09-21';
+const UPDATE_MANIFEST_PATH = 'version.json';
+const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
+
+const storageReadErrors = {};
+function readStoredJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed == null ? fallback : parsed;
+  } catch (err) {
+    storageReadErrors[key] = true;
+    console.warn(`Failed to parse ${key}; using fallback`, err);
+    return fallback;
+  }
+}
+
+let classes = readStoredJSON('mst_classes', []);
+let tasks   = readStoredJSON('mst_tasks', []);
+let calendarEvents = readStoredJSON('mst_calendar_events', {});
 let calendarViewDate = new Date();
 calendarViewDate.setDate(1);
 let selectedCalendarDate = null;
 let calendarLastFocusedElement = null;
+let updateState = {
+  updateAvailable: false,
+  latestVersion: null,
+  releasedAt: null,
+  retryCount: 0,
+  retryTimer: null,
+  checking: false,
+  applying: false
+};
 
 function save() {
   localStorage.setItem('mst_classes', JSON.stringify(classes));
@@ -1460,7 +1510,167 @@ const SETTING_DEFAULTS = {
   hideGrades: false,
 };
 
-let settings = { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem('mst_settings') || '{}') };
+let settings = { ...SETTING_DEFAULTS, ...readStoredJSON('mst_settings', {}) };
+
+function writeRecoverySnapshot() {
+  localStorage.setItem(UPDATE_RECOVERY_KEY, JSON.stringify({
+    createdAt: new Date().toISOString(),
+    appVersion: APP_VERSION,
+    classes,
+    tasks,
+    calendarEvents,
+    settings
+  }));
+}
+
+function recoverFromSnapshotIfNeeded() {
+  const hadReadError = !!(storageReadErrors.mst_classes || storageReadErrors.mst_tasks || storageReadErrors.mst_calendar_events || storageReadErrors.mst_settings);
+  if (!hadReadError) return;
+  const snapshot = readStoredJSON(UPDATE_RECOVERY_KEY, null);
+  if (!snapshot || typeof snapshot !== 'object') return;
+  if (Array.isArray(snapshot.classes)) classes = snapshot.classes;
+  if (Array.isArray(snapshot.tasks)) tasks = snapshot.tasks;
+  if (snapshot.calendarEvents && typeof snapshot.calendarEvents === 'object') calendarEvents = snapshot.calendarEvents;
+  if (snapshot.settings && typeof snapshot.settings === 'object') settings = { ...SETTING_DEFAULTS, ...snapshot.settings };
+  save();
+  localStorage.setItem('mst_settings', JSON.stringify(settings));
+  toast('Recovered data from update snapshot', false);
+}
+
+function compareVersions(a, b) {
+  const clean = v => String(v || '').trim().replace(/^v/i, '');
+  const av = clean(a);
+  const bv = clean(b);
+  const numericLike = v => /^[0-9]+(\.[0-9]+)*$/.test(v);
+  if (numericLike(av) && numericLike(bv)) {
+    const aParts = av.split('.').map(Number);
+    const bParts = bv.split('.').map(Number);
+    const maxLen = Math.max(aParts.length, bParts.length);
+    for (let i = 0; i < maxLen; i++) {
+      const diff = (aParts[i] || 0) - (bParts[i] || 0);
+      if (diff !== 0) return diff;
+    }
+    return 0;
+  }
+  return av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
+}
+
+function hasUnsavedWork() {
+  const draftFields = ['t-title', 't-due', 't-notes', 'paste-input', 'calendar-event-title', 'calendar-event-details'];
+  return draftFields.some(id => {
+    const el = document.getElementById(id);
+    return !!(el && typeof el.value === 'string' && el.value.trim());
+  });
+}
+
+function setUpdateStatus(text, isError = false) {
+  const el = document.getElementById('update-status');
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = isError ? 'var(--red)' : 'var(--text3)';
+}
+
+function formatReleaseDateForUi(value) {
+  if (!value) return APP_RELEASE_DATE;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return APP_RELEASE_DATE;
+  return d.toISOString().slice(0, 10);
+}
+
+function renderAboutInfo() {
+  const versionEl = document.getElementById('about-version');
+  const dateEl = document.getElementById('about-release-date');
+  if (versionEl) versionEl.textContent = APP_VERSION;
+  if (dateEl) dateEl.textContent = formatReleaseDateForUi(updateState.releasedAt || APP_RELEASE_DATE);
+}
+
+function renderUpdateAvailability() {
+  const row = document.getElementById('update-available-row');
+  const label = document.getElementById('update-available-version');
+  if (!row || !label) return;
+  row.style.display = updateState.updateAvailable ? '' : 'none';
+  if (updateState.updateAvailable) {
+    label.textContent = `v${updateState.latestVersion} is ready`;
+  }
+}
+
+function applyUpdateNow(force = false) {
+  if (updateState.applying || !updateState.updateAvailable) return;
+  if (hasUnsavedWork() && !force) {
+    if (!confirm('You have unsaved text in forms. Reloading now may discard it. Update anyway?')) return;
+  }
+  save();
+  localStorage.setItem('mst_settings', JSON.stringify(settings));
+  writeRecoverySnapshot();
+  updateState.applying = true;
+  setUpdateStatus('Applying update…');
+  toast('Applying update…');
+  setTimeout(() => window.location.reload(), 150);
+}
+
+function scheduleUpdateRetry() {
+  clearTimeout(updateState.retryTimer);
+  const delay = Math.min(15 * 60 * 1000, 30 * 1000 * (2 ** updateState.retryCount));
+  updateState.retryCount += 1;
+  updateState.retryTimer = setTimeout(() => checkForUpdates({ manual: false }), delay);
+}
+
+async function fetchUpdateManifest() {
+  if (window.location.protocol === 'file:') {
+    throw new Error('Update checks need a web server (http/https), not file://.');
+  }
+  const url = new URL(UPDATE_MANIFEST_PATH, window.location.href);
+  url.searchParams.set('t', String(Date.now()));
+  const res = await fetch(url.toString(), { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Update metadata request failed (${res.status})`);
+  const meta = await res.json();
+  if (!meta || typeof meta.version !== 'string' || !meta.version.trim()) {
+    throw new Error('Update metadata is missing a valid version field');
+  }
+  return meta;
+}
+
+async function checkForUpdates({ manual = false } = {}) {
+  if (updateState.checking || updateState.applying) return;
+  updateState.checking = true;
+  setUpdateStatus('Checking for updates…');
+  try {
+    const meta = await fetchUpdateManifest();
+    updateState.retryCount = 0;
+    updateState.latestVersion = meta.version.trim();
+    updateState.releasedAt = meta.releasedAt || null;
+    renderAboutInfo();
+    const comparison = compareVersions(updateState.latestVersion, APP_VERSION);
+    if (comparison > 0) {
+      updateState.updateAvailable = true;
+      renderUpdateAvailability();
+      if (!hasUnsavedWork()) {
+        setUpdateStatus(`New version ${updateState.latestVersion} found. Applying now…`);
+        applyUpdateNow(true);
+      } else {
+        setUpdateStatus(`New version ${updateState.latestVersion} is ready. Clear/save drafts to auto-apply.`);
+        toast(`Update available: v${updateState.latestVersion}`);
+      }
+    } else {
+      updateState.updateAvailable = false;
+      renderUpdateAvailability();
+      setUpdateStatus(`Up to date (v${APP_VERSION})`);
+      if (manual) toast('You are on the latest version');
+    }
+  } catch (err) {
+    updateState.updateAvailable = false;
+    renderUpdateAvailability();
+    setUpdateStatus(err.message || 'Update check failed', true);
+    if (manual) toast(err.message || 'Update check failed', false);
+    if (!manual) scheduleUpdateRetry();
+  } finally {
+    updateState.checking = false;
+  }
+}
+
+function manualCheckForUpdates() {
+  checkForUpdates({ manual: true });
+}
 
 function updateCustomColor(hex) {
   saveSetting('accentColor', hex);
@@ -1607,8 +1817,16 @@ document.addEventListener('keydown', (event) => {
 // ── Init ─────────────────────────────────────────────────────
 rebuildClassSelects();
 applySettings();
+recoverFromSnapshotIfNeeded();
+renderAboutInfo();
+renderUpdateAvailability();
 ensureCalendarWeekdays();
 renderGrades();
+checkForUpdates({ manual: false });
+setInterval(() => checkForUpdates({ manual: false }), 30 * 60 * 1000);
+window.addEventListener('focus', () => {
+  if (updateState.updateAvailable && !hasUnsavedWork()) applyUpdateNow(true);
+});
 fetch("https://mistar.oakland.k12.mi.us/royaloak/StudentPortal/Home/Login", {
   "headers": {
     "accept": "*/*",
