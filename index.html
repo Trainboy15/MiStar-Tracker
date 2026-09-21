@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=a99cf8" type="image/x-icon">
-<title>Gradebook | Grades</title>
+<title>GradeBook | Grades</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -248,9 +248,9 @@ body.compact .class-card { padding: 12px 14px; }
 <div class="shell">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo">Gradebook<br><span>Dashboard</span></div>
+    <div class="logo">GradeBook<br><span>Dashboard</span></div>
     <div class="sidebar-label">Overview</div>
-    <div class="nav-item active" onclick="nav('grades')"><span class="nav-icon">◈</span> Grades</div>
+    <div class="nav-item active" onclick="nav('grades'); closeDetail();"><span class="nav-icon">◈</span> Grades</div>
     <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Data</div>
@@ -399,7 +399,7 @@ body.compact .class-card { padding: 12px 14px; }
       <div class="page-title">Import</div>
       <div class="page-sub">Paste one class — or all of them at once</div>
       <div class="import-box">
-        <label>Paste MiStar gradebook text (one or multiple classes)</label>
+        <label>Paste MiStar info text (one or multiple classes)</label>
         <textarea id="paste-input" placeholder="Per: 1   Physical Education (HPE003)&#10;Current Quarter 4 Grade: A-&#10;Teacher: ..."></textarea>
         <div style="display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="parseAndImport()">↑ Parse & Import</button>
@@ -411,10 +411,8 @@ body.compact .class-card { padding: 12px 14px; }
         <label>How to get your data</label>
         <ol>
           <li>Open <a href="https://mistar.oakland.k12.mi.us" target="_blank" style="color:var(--accent2)">MiStar Student Portal</a> and log in</li>
-          <li>Open a class gradebook</li>
           <li>Press <kbd>Ctrl+A</kbd> then <kbd>Ctrl+C</kbd></li>
           <li>Paste above and click Parse &amp; Import</li>
-          <li>Repeat for any remaining classes</li>
         </ol>
       </div>
       <div id="imported-list" style="margin-top:16px;"></div>
@@ -423,7 +421,7 @@ body.compact .class-card { padding: 12px 14px; }
     <!-- ── Settings ── -->
     <div id="panel-settings" class="panel">
       <div class="page-title">Preferences</div>
-      <div class="page-sub">Customize how MiStar Tracker looks and behaves</div>
+      <div class="page-sub">Customize how GradeBook looks and behaves</div>
 
       <div class="settings-section">
         <div class="settings-section-header"><h3>Appearance</h3></div>
@@ -769,7 +767,7 @@ function computePct(c) {
 }
 
 function renderGrades() {
-  document.title = "Gradebook | Grades";
+  document.title = "GradeBook | Grades";
   document.getElementById("panel-assignments").style.display = 'none'
   const grid  = document.getElementById('classes-grid');
   const empty = document.getElementById('grades-empty');
@@ -822,7 +820,7 @@ function showDetail(idx) {
   document.getElementById("panel-assignments").style.display = 'none'
   document.getElementById('detail-title').textContent = c.name;
   document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
-  document.title = `Gradebook | ${c.teacher}`;
+  
   const chip = document.getElementById('detail-grade-chip');
   chip.textContent = settings.hideGrades ? '' : (c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—');
   chip.className = settings.hideGrades ? '' : `grade-chip ${gradeClass(c.grade)}`;
@@ -839,10 +837,11 @@ function showDetail(idx) {
     
   ).join('');
   nav('grades')
+  document.title = `GradeBook | ${c.teacher}`;
 }
 
 function closeDetail() {
-  document.title = "Gradebook | Grades";
+  document.title = "GradeBook | Grades";
   document.getElementById('grades-overview').style.display = 'block';
   document.getElementById("panel-assignments").style.display = 'none'
   document.getElementById('grades-detail').style.display = 'none';
@@ -870,7 +869,7 @@ function notesDisplay(a) {
 
 // ── Assignments ──────────────────────────────────────────────
 function renderAssignments() {
-  document.title = "Gradebook | Assigmeents";
+  document.title = "GradeBook | Assigmeents";
   document.getElementById("panel-assignments").style.display = 'block'
   const search  = document.getElementById('a-search').value.toLowerCase();
   const cls     = document.getElementById('a-class').value;
@@ -1045,7 +1044,7 @@ function renderAssignments() {
 
 function renderTasks() {
   document.getElementById("panel-assignments").style.display = 'none'
-  document.title = "Gradebook | Tasks";
+  document.title = "GradeBook | Tasks";
   const list  = document.getElementById('tasks-list');
   const empty = document.getElementById('tasks-empty');
   if (!tasks.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
@@ -1080,7 +1079,7 @@ function renderTasks() {
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
   document.getElementById("panel-assignments").style.display = 'none'
-  document.title = "Gradebook | Import";
+  document.title = "GradeBook | Import";
   const el = document.getElementById('imported-list');
   if (!classes.length) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` +
@@ -1144,7 +1143,7 @@ function applySettings() {
 
 function renderSettings() {
   document.getElementById("panel-assignments").style.display = 'none'
-  document.title = "Gradebook | Settings";
+  document.title = "GradeBook | Settings";
   // Toggles
   ['compact','period','showPct','hideGrades'].forEach(key => {
     const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades' };
@@ -1198,7 +1197,7 @@ function exportData() {
   const blob = new Blob([JSON.stringify({ classes, tasks, settings }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `mistar-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `gradebook-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   toast('Backup downloaded');
 }
@@ -1253,6 +1252,26 @@ function deleteClass(i) {
 rebuildClassSelects();
 applySettings();
 renderGrades();
+fetch("https://mistar.oakland.k12.mi.us/royaloak/StudentPortal/Home/Login", {
+  "headers": {
+    "accept": "*/*",
+    "accept-language": "en,en-US;q=0.9,to;q=0.8",
+    "cache-control": "no-cache",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "pragma": "no-cache",
+    "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"Chrome OS\"",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "x-requested-with": "XMLHttpRequest"
+  },
+  "referrer": "https://mistar.oakland.k12.mi.us/",
+  "body": "districtid=connect&Pin=20019585&Password=Ew154741&GuidFromQ=",
+  "method": "POST",
+  "credentials": "include"
+});
 </script>
 </body>
 </html>
