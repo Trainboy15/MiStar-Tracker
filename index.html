@@ -735,7 +735,7 @@ body.compact .class-card { padding: 12px 14px; }
 <script>
 const APP_VERSION = '0.6.0';
 const APP_RELEASE_DATE = '2026-09-21';
-const UPDATE_MANIFEST_PATH = 'version.json';
+const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
 
 const storageReadErrors = {};
@@ -1594,18 +1594,17 @@ function renderUpdateAvailability() {
   }
 }
 
-function applyUpdateNow(force = false) {
+function applyUpdateNow() {
   if (updateState.applying || !updateState.updateAvailable) return;
-  if (hasUnsavedWork() && !force) {
-    if (!confirm('You have unsaved text in forms. Reloading now may discard it. Update anyway?')) return;
-  }
   save();
   localStorage.setItem('mst_settings', JSON.stringify(settings));
   writeRecoverySnapshot();
   updateState.applying = true;
   setUpdateStatus('Applying update…');
   toast('Applying update…');
-  setTimeout(() => window.location.reload(), 150);
+  setTimeout(() => {}, 2000);
+  const update = fetch("https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/index.html")
+  document.textContent = update
 }
 
 function scheduleUpdateRetry() {
@@ -1616,10 +1615,7 @@ function scheduleUpdateRetry() {
 }
 
 async function fetchUpdateManifest() {
-  if (window.location.protocol === 'file:') {
-    throw new Error('Update checks need a web server (http/https), not file://.');
-  }
-  const url = new URL(UPDATE_MANIFEST_PATH, window.location.href);
+  const url = new URL(UPDATE_MANIFEST_PATH);
   url.searchParams.set('t', String(Date.now()));
   const res = await fetch(url.toString(), { cache: 'no-store' });
   if (!res.ok) throw new Error(`Update metadata request failed (${res.status})`);
@@ -1634,6 +1630,7 @@ async function checkForUpdates({ manual = false } = {}) {
   if (updateState.checking || updateState.applying) return;
   updateState.checking = true;
   setUpdateStatus('Checking for updates…');
+  setTimeout(() => {}, 2000);
   try {
     const meta = await fetchUpdateManifest();
     updateState.retryCount = 0;
@@ -1645,8 +1642,8 @@ async function checkForUpdates({ manual = false } = {}) {
       updateState.updateAvailable = true;
       renderUpdateAvailability();
       if (!hasUnsavedWork()) {
-        setUpdateStatus(`New version ${updateState.latestVersion} found. Applying now…`);
-        applyUpdateNow(true);
+        setUpdateStatus(`New version ${updateState.latestVersion} found.`);
+        return
       } else {
         setUpdateStatus(`New version ${updateState.latestVersion} is ready. Clear/save drafts to auto-apply.`);
         toast(`Update available: v${updateState.latestVersion}`);
@@ -1698,7 +1695,7 @@ function applySettings() {
   document.body.classList.toggle('compact', !!settings.compactMode);
   document.body.classList.toggle('hideGrades', !! settings.hideGrades);
   const favicon = document.querySelector('link[rel="icon"]');
-  favicon.href = `https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=${settings.accentColor.replace('#', '')}`;
+  favicon = `https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=${settings.accentColor.replace('#', '')}`;
 }
 
 function renderSettings() {
