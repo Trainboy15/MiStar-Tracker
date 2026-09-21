@@ -733,7 +733,7 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-const APP_VERSION = '0.6.0';
+const APP_VERSION = '0.6.2';
 const APP_RELEASE_DATE = '2026-09-21';
 const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -1617,6 +1617,7 @@ async function applyUpdateNow() { // 1. Added 'async'
             document.open();
             document.write(updateText);
             document.close();
+            window.location.reload();
         }, 1000);
 
     } catch (error) {
@@ -1663,6 +1664,7 @@ async function checkForUpdates({ manual = false } = {}) {
       renderUpdateAvailability();
       if (!hasUnsavedWork()) {
         setUpdateStatus(`New version ${updateState.latestVersion} found.`);
+        toast(`Update available: v${updateState.latestVersion}`);
         return
       } else {
         setUpdateStatus(`New version ${updateState.latestVersion} is ready. Clear/save drafts to auto-apply.`);
@@ -1840,26 +1842,6 @@ renderUpdateAvailability();
 ensureCalendarWeekdays();
 renderGrades();
 checkForUpdates({ manual: false });
-fetch("https://mistar.oakland.k12.mi.us/royaloak/StudentPortal/Home/Login", {
-  "headers": {
-    "accept": "*/*",
-    "accept-language": "en,en-US;q=0.9,to;q=0.8",
-    "cache-control": "no-cache",
-    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "pragma": "no-cache",
-    "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": "\"Chrome OS\"",
-    "sec-fetch-dest": "empty",
-    "sec-fetch-mode": "cors",
-    "sec-fetch-site": "same-origin",
-    "x-requested-with": "XMLHttpRequest"
-  },
-  "referrer": "https://mistar.oakland.k12.mi.us/",
-  "body": "districtid=connect&Pin=20019585&Password=Ew154741&GuidFromQ=",
-  "method": "POST",
-  "credentials": "include"
-});
 </script>
 </body>
 </html>
