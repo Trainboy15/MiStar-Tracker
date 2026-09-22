@@ -339,6 +339,9 @@ body.compact .class-card { padding: 12px 14px; }
     <div class="nav-item" onclick="nav('assignments')"><span class="nav-icon">🗐</span> Assignments</div>
     <div class="nav-item" onclick="nav('import')"><span class="nav-icon">⤒</span> Import</div>
     <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Rewards</div>
+    <div class="nav-item" onclick="nav('games')"><span class="nav-icon" style="color: #7c6ef4; text-shadow: 0 0 5px #7c6ef4, 0 0 10px #7c6ef4, 0 0 20px #7c6ef4, 0 0 40px #7c6ef4;">♜</span> Games</div>
+    <div class="sidebar-sep"></div>
     <div class="sidebar-label">Settings</div>
     <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⛭</span>Preferences</div>
   </aside>
@@ -495,29 +498,11 @@ body.compact .class-card { padding: 12px 14px; }
     </div>
 
     <!-- ── Import ── -->
-    <div id="panel-import" class="panel">
-      <div class="page-title">Import</div>
-      <div class="page-sub">Paste one class — or all of them at once</div>
-      <div class="import-box">
-        <label>Paste MiStar info text (one or multiple classes)</label>
-        <textarea id="paste-input" placeholder="Per: 1   Physical Education (HPE003)&#10;Current Quarter 4 Grade: A-&#10;Teacher: ..."></textarea>
-        <div style="display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap;">
-          <button class="btn btn-primary" onclick="parseAndImport()">↑ Parse & Import</button>
-          <button class="btn" onclick="document.getElementById('paste-input').value=''">Clear</button>
-          <span style="font-size:12px; color:var(--text3);">Supports pasting the entire page at once (Ctrl+A, Ctrl+C)</span>
-        </div>
-      </div>
-      <div class="import-box import-hint">
-        <label>How to get your data</label>
-        <ol>
-          <li>Open <a href="https://mistar.oakland.k12.mi.us" target="_blank" style="color:var(--accent2)">MiStar Student Portal</a> and log in</li>
-          <li>Press <kbd>Ctrl+A</kbd> then <kbd>Ctrl+C</kbd></li>
-          <li>Paste above and click Parse &amp; Import</li>
-        </ol>
-      </div>
-      <div id="imported-list" style="margin-top:16px;"></div>
+    <div id="panel-games" class="panel">
+      <div class="page-title">Games</div>
+      <div class="page-sub">Play games with good grades</div>
+      
     </div>
-
     <!-- ── Settings ── -->
     <div id="panel-settings" class="panel">
       <div class="page-title">Preferences</div>
