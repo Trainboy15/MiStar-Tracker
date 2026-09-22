@@ -751,7 +751,7 @@ let updateState = {
 };
 
 function save() {
-  localStorage.setItem('mst_classes', JSON.stringify(classes));
+  window.parent.postMessage('mst_classes', JSON.stringify(classes));
   localStorage.setItem('mst_tasks',   JSON.stringify(tasks));
   localStorage.setItem('mst_calendar_events', JSON.stringify(calendarEvents));
 }
