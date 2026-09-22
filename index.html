@@ -799,16 +799,23 @@ function escapeHtml(str) {
 function nav(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.getElementById('panel-' + id).classList.add('active');
+  
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+
+  // Safe check using optional chaining (?.)
+  document.getElementById('panel-' + id)?.classList.add('active');
+
   if (id === 'grades') renderGrades();
   if (id === 'tasks') renderTasks();
   if (id === 'calendar') renderCalendar();
   if (id === 'assignments') renderAssignments();
   if (id === 'import') renderImportedList();
   if (id === 'games') renderGames();
-  if (id === 'settings') { renderSettings(); }
+  if (id === 'settings') renderSettings();
 }
+
 
 // ── Parser ──────────────────────────────────────────────────
 function parseMiStar(text) {
@@ -961,6 +968,7 @@ function computePct(c) {
 function renderGrades() {
   document.title = "GradeBook | Grades";
   document.getElementById("panel-assignments").style.display = 'none'
+  document.getElementById("panel-games").style.display = 'none'
   const grid  = document.getElementById('classes-grid');
   const empty = document.getElementById('grades-empty');
   const mets  = document.getElementById('metrics');
@@ -1063,6 +1071,8 @@ function notesDisplay(a) {
 function renderAssignments() {
   document.title = "GradeBook | Assigmeents";
   document.getElementById("panel-assignments").style.display = 'block'
+  document.getElementById("panel-games").style.display = 'none'
+
   const search  = document.getElementById('a-search').value.toLowerCase();
   const cls     = document.getElementById('a-class').value;
   const status  = document.getElementById('a-status').value;
@@ -1236,6 +1246,8 @@ function renderAssignments() {
 
 function renderTasks() {
   document.getElementById("panel-assignments").style.display = 'none'
+  document.getElementById("panel-games").style.display = 'none'
+
   document.title = "GradeBook | Tasks";
   const list  = document.getElementById('tasks-list');
   const empty = document.getElementById('tasks-empty');
@@ -1296,6 +1308,8 @@ function ensureCalendarWeekdays() {
 function renderCalendar() {
   document.title = "GradeBook | Calendar";
   document.getElementById("panel-assignments").style.display = 'none';
+  document.getElementById("panel-games").style.display = 'none'
+
   ensureCalendarWeekdays();
   const monthLabel = document.getElementById('calendar-month-label');
   const grid = document.getElementById('calendar-grid');
@@ -1482,13 +1496,20 @@ function saveCalendarEvent() {
 
 // ── Import list ──────────────────────────────────────────────
 function renderImportedList() {
-  document.getElementById("panel-assignments").style.display = 'none'
-  document.title = "GradeBook | Import";
+  document.getElementById('panel-assignments').style.display = 'none';
+  document.getElementById('panel-games').style.display = 'none';
+  document.title = 'GradeBook | Import';
+  
   const el = document.getElementById('imported-list');
-  if (!classes.length) { el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` +
-    classes.map((c, i) =>
-      `<div class="imported-row">
+  
+  if (!classes.length) {
+    el.innerHTML = '';
+    return;
+  }
+  
+  el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` + 
+    classes.map((c, i) => `
+      <div class="imported-row">
         <div>
           <span style="font-size:14px;font-weight:500">${c.name}</span>
           <span style="font-size:12px;font-family:var(--mono);color:var(--text3);margin-left:8px">${c.code}</span>
@@ -1497,9 +1518,10 @@ function renderImportedList() {
           <span style="font-size:12px;color:var(--text3)">${c.assignments.length} items</span>
           <button class="btn btn-ghost btn-sm" onclick="deleteClass(${i})" title="Remove">✕</button>
         </div>
-      </div>`
-    ).join('');
+      </div>
+    `).join('');
 }
+
 
 function renderGames() {
   document.getElementById("panel-assignments").style.display = 'none'
@@ -1731,6 +1753,7 @@ function applySettings() {
 
 function renderSettings() {
   document.getElementById("panel-assignments").style.display = 'none'
+  document.getElementById("panel-games").style.display = 'none'
   document.title = "GradeBook | Settings";
   // Toggles
   ['compact','period','showPct','hideGrades','notifications'].forEach(key => {
