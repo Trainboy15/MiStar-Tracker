@@ -712,7 +712,7 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-const APP_VERSION = '0.6.7';
+const APP_VERSION = '0.6.8';
 const APP_RELEASE_DATE = '2026-09-21';
 const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -751,10 +751,28 @@ let updateState = {
 };
 
 function save() {
-  window.parent.postMessage('mst_classes', JSON.stringify(classes));
-  localStorage.setItem('mst_tasks',   JSON.stringify(tasks));
-  localStorage.setItem('mst_calendar_events', JSON.stringify(calendarEvents));
+  // 1. Combine your identifier ('mst_classes') and your actual data into one payload object
+  const mst_classes = {
+    type: 'mst_classes',
+    data: JSON.stringify(classes)
+  };
+  const mst_tasks = {
+    type: 'mst_tasks',
+    data: JSON.stringify(tasks)
+  };
+  const mst_calendar_events = {
+    type: 'mst_calendar_events',
+    data: JSON.stringify(calendarEvents)
+  };
+
+  // 2. Pass the payload as the FIRST argument.
+  // Pass the target origin as the SECOND argument. 
+  // (We use '*' here because Google Sites assigns random subdomains to embed boxes)
+  window.parent.postMessage(mst_classes, '*');
+  window.parent.postMessage(mst_tasks, '*');
+  window.parent.postMessage(mst_calendar_events, '*');
 }
+
 
 function toast(msg, ok = true) {
   const el = document.getElementById('toast');
