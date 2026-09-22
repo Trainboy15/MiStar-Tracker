@@ -1,6 +1,6 @@
 {
-  "version": "0.7.1",
+  "version": "0.7.2",
   "releasedAt": "2026-09-22",
-  "notes": "Start work on games"
+  "notes": "Fix import"
 }
 
