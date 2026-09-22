@@ -615,6 +615,38 @@ body.compact .class-card { padding: 12px 14px; }
       </div>
 
       <div class="settings-section">
+        <div class="settings-section-header"><h3>Notifications</h3><span>Browser alerts for task and calendar reminders</span></div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Enable notifications</div>
+            <div class="settings-row-desc">Get alerts for upcoming and due tasks/calendar events</div>
+          </div>
+          <div class="settings-row-right"><div class="toggle" id="toggle-notifications" onclick="toggleNotificationsSetting()"></div></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Reminder timing</div>
+            <div class="settings-row-desc">Choose how many days before due date/event date to alert</div>
+          </div>
+          <div class="settings-row-right">
+            <select class="settings-select" id="setting-notificationLeadDays" onchange="saveSetting('notificationLeadDays', this.value)">
+              <option value="0">On due date</option>
+              <option value="1">1 day before</option>
+              <option value="2">2 days before</option>
+              <option value="3">3 days before</option>
+              <option value="7">1 week before</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Browser permission</div>
+            <div class="settings-row-desc" id="notifications-permission-state">Checking browser support…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
         <div class="settings-section-header"><h3>Data</h3><span>Stored in your browser's localStorage</span></div>
         <div class="settings-row">
           <div>
@@ -736,6 +768,7 @@ function readStoredJSON(key, fallback) {
 let classes = readStoredJSON('mst_classes', []);
 let tasks   = readStoredJSON('mst_tasks', []);
 let calendarEvents = readStoredJSON('mst_calendar_events', {});
+let notifiedReminders = readStoredJSON('mst_notified_reminders', {});
 let calendarViewDate = new Date();
 calendarViewDate.setDate(1);
 let selectedCalendarDate = null;
@@ -754,6 +787,10 @@ function save() {
   localStorage.setItem('mst_classes', JSON.stringify(classes));
   localStorage.setItem('mst_tasks',   JSON.stringify(tasks));
   localStorage.setItem('mst_calendar_events', JSON.stringify(calendarEvents));
+}
+
+function saveNotifiedReminders() {
+  localStorage.setItem('mst_notified_reminders', JSON.stringify(notifiedReminders));
 }
 
 function toast(msg, ok = true) {
@@ -1489,6 +1526,8 @@ const SETTING_DEFAULTS = {
   hideCompleted: 'never',
   accentColor:   '#7c6ef4',
   hideGrades: false,
+  notificationsEnabled: false,
+  notificationLeadDays: '1',
 };
 
 let settings = { ...SETTING_DEFAULTS, ...readStoredJSON('mst_settings', {}) };
@@ -1518,12 +1557,163 @@ function saveSetting(key, value) {
   settings[key] = value;
   localStorage.setItem('mst_settings', JSON.stringify(settings));
   applySettings();
+  if (key === 'notificationLeadDays' || key === 'notificationsEnabled') {
+    checkReminderNotifications();
+  }
 }
 
 function toggleSetting(key) {
   saveSetting(key, !settings[key]);
   console.log(key)
   renderSettings();
+}
+
+function notificationsSupported() {
+  return typeof window !== 'undefined' && 'Notification' in window;
+}
+
+function notificationPermissionState() {
+  if (!notificationsSupported()) return 'unsupported';
+  return Notification.permission;
+}
+
+async function requestNotificationPermission() {
+  if (!notificationsSupported()) {
+    toast('Browser notifications are not supported here.', false);
+    return false;
+  }
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') {
+    toast('Notification permission is blocked in your browser settings.', false);
+    return false;
+  }
+  try {
+    const result = await Notification.requestPermission();
+    if (result === 'granted') return true;
+    toast('Notifications stay off until you allow browser permission.', false);
+    return false;
+  } catch (error) {
+    console.warn('Notification permission request failed', error);
+    toast('Unable to request notification permission right now.', false);
+    return false;
+  }
+}
+
+async function toggleNotificationsSetting() {
+  const shouldEnable = !settings.notificationsEnabled;
+  if (!shouldEnable) {
+    saveSetting('notificationsEnabled', false);
+    renderSettings();
+    toast('Notifications disabled');
+    return;
+  }
+
+  const granted = await requestNotificationPermission();
+  saveSetting('notificationsEnabled', granted);
+  renderSettings();
+  if (granted) {
+    toast('Notifications enabled');
+    checkReminderNotifications();
+  }
+}
+
+function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function parseDateOnly(dateString) {
+  if (typeof dateString !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return null;
+  const [year, month, day] = dateString.split('-').map(Number);
+  const parsed = new Date(year, month - 1, day);
+  if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
+  return parsed;
+}
+
+function classifyReminderDay(dateString, leadDays) {
+  const dueDate = parseDateOnly(dateString);
+  if (!dueDate) return null;
+  const today = startOfLocalDay(new Date());
+  const dayDelta = Math.round((startOfLocalDay(dueDate).getTime() - today.getTime()) / 86400000);
+  if (dayDelta < 0) return null;
+  if (dayDelta === 0) return 'due';
+  if (leadDays > 0 && dayDelta === leadDays) return 'upcoming';
+  return null;
+}
+
+function sendReminderNotification(title, body, tag) {
+  if (!notificationsSupported() || Notification.permission !== 'granted') return false;
+  try {
+    new Notification(title, { body, tag, renotify: false });
+    return true;
+  } catch (error) {
+    console.warn('Failed to show notification', error);
+    return false;
+  }
+}
+
+function pruneNotifiedReminders() {
+  if (!notifiedReminders || typeof notifiedReminders !== 'object' || Array.isArray(notifiedReminders)) {
+    notifiedReminders = {};
+    return;
+  }
+  const cutoff = Date.now() - (45 * 24 * 60 * 60 * 1000);
+  let changed = false;
+  Object.keys(notifiedReminders).forEach(key => {
+    if (typeof notifiedReminders[key] !== 'number' || notifiedReminders[key] < cutoff) {
+      delete notifiedReminders[key];
+      changed = true;
+    }
+  });
+  if (changed) saveNotifiedReminders();
+}
+
+function checkReminderNotifications() {
+  pruneNotifiedReminders();
+  if (!settings.notificationsEnabled) return;
+  if (!notificationsSupported() || Notification.permission !== 'granted') return;
+
+  const leadDays = Math.max(0, parseInt(settings.notificationLeadDays, 10) || 0);
+  let hasNewReminder = false;
+
+  tasks.forEach(task => {
+    if (!task || task.completed || !task.title || !task.due) return;
+    const reminderType = classifyReminderDay(task.due, leadDays);
+    if (!reminderType) return;
+    const className = classes.find(c => c.code === task.classCode)?.name;
+    const reminderKey = `task|${task.id}|${task.due}|${reminderType}|${leadDays}`;
+    if (notifiedReminders[reminderKey]) return;
+    const dateText = parseDateOnly(task.due)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) || task.due;
+    const body = reminderType === 'due'
+      ? `${task.title} is due today${className ? ` · ${className}` : ''}.`
+      : `${task.title} is due on ${dateText}${className ? ` · ${className}` : ''}.`;
+    if (sendReminderNotification('Task reminder', body, reminderKey)) {
+      notifiedReminders[reminderKey] = Date.now();
+      hasNewReminder = true;
+    }
+  });
+
+  Object.entries(calendarEvents || {}).forEach(([dateKey, dayEvents]) => {
+    if (!Array.isArray(dayEvents)) return;
+    const reminderType = classifyReminderDay(dateKey, leadDays);
+    if (!reminderType) return;
+    const dateText = parseDateOnly(dateKey)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) || dateKey;
+    dayEvents.forEach((eventItem, index) => {
+      const title = eventItem?.title?.trim();
+      if (!title) return;
+      const details = (eventItem?.details || '').trim();
+      const reminderKey = `calendar|${dateKey}|${index}|${title}|${details}|${reminderType}|${leadDays}`;
+      if (notifiedReminders[reminderKey]) return;
+      const body = reminderType === 'due'
+        ? `${title} is scheduled for today.`
+        : `${title} is scheduled for ${dateText}.`;
+      if (sendReminderNotification('Calendar reminder', body, reminderKey)) {
+        notifiedReminders[reminderKey] = Date.now();
+        hasNewReminder = true;
+      }
+    });
+  });
+
+  if (hasNewReminder) saveNotifiedReminders();
 }
 
 function applySettings() {
@@ -1550,17 +1740,28 @@ function renderSettings() {
   document.getElementById("panel-assignments").style.display = 'none'
   document.title = "GradeBook | Settings";
   // Toggles
-  ['compact','period','showPct','hideGrades'].forEach(key => {
-    const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades' };
+  ['compact','period','showPct','hideGrades','notifications'].forEach(key => {
+    const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades', notifications: 'notificationsEnabled' };
     const el = document.getElementById('toggle-' + key);
     if (el) el.classList.toggle('on', !!settings[map[key]]);
   });
 
   // Selects
-  ['lowThreshold','assignSort','autoPriority','hideCompleted'].forEach(key => {
+  ['lowThreshold','assignSort','autoPriority','hideCompleted','notificationLeadDays'].forEach(key => {
     const el = document.getElementById('setting-' + key);
     if (el) el.value = settings[key];
   });
+  const notificationLeadSelect = document.getElementById('setting-notificationLeadDays');
+  if (notificationLeadSelect) notificationLeadSelect.disabled = !settings.notificationsEnabled;
+
+  const notificationStatus = document.getElementById('notifications-permission-state');
+  if (notificationStatus) {
+    const permission = notificationPermissionState();
+    if (permission === 'unsupported') notificationStatus.textContent = 'This browser does not support notifications for this app.';
+    else if (permission === 'granted') notificationStatus.textContent = 'Permission granted. Reminders can be shown while this tab is open.';
+    else if (permission === 'denied') notificationStatus.textContent = 'Permission blocked. Enable notifications for this site in browser settings.';
+    else notificationStatus.textContent = 'Permission not granted yet. Turn on notifications to request access.';
+  }
 
   const sw = document.getElementById('color-swatches');
   if (sw) {
@@ -1637,7 +1838,9 @@ function clearAllTasks() {
 function clearAllData() {
   if (!confirm('Delete ALL classes, assignments, and tasks? This cannot be undone.')) return;
   classes = []; tasks = [];
+  notifiedReminders = {};
   save();
+  saveNotifiedReminders();
   rebuildClassSelects();
   renderGrades();
   toast('All data cleared');
@@ -1666,7 +1869,9 @@ ensureCalendarWeekdays();
 renderGrades();
 setInterval(() => {
   checkForUpdates();
+  checkReminderNotifications();
 }, 60000);
+checkReminderNotifications();
 </script>
 </body>
 </html>
