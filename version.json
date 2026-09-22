@@ -1,5 +1,6 @@
 {
-  "version": "0.6.9",
-  "releasedAt": "2026-09-21T00:00:00Z",
-  "notes": "Revert"
+  "version": "0.6.10",
+  "releasedAt": "2026-09-22",
+  "notes": "Update renderCalender()"
 }
+
