@@ -340,7 +340,7 @@ body.compact .class-card { padding: 12px 14px; }
     <div class="nav-item" onclick="nav('import')"><span class="nav-icon">⤒</span> Import</div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Rewards</div>
-    <div class="nav-item" onclick="toast('Coming soon')"><span class="nav-icon" style="color: #7c6ef4; text-shadow: 0 0 5px #7c6ef4, 0 0 10px #7c6ef4, 0 0 20px #7c6ef4, 0 0 40px #7c6ef4;">♜</span><s> Games</s></div>
+    <div class="nav-item" onclick="nav('games')"><span class="nav-icon" style="color: #7c6ef4; text-shadow: 0 0 5px #7c6ef4, 0 0 10px #7c6ef4, 0 0 20px #7c6ef4, 0 0 40px #7c6ef4; size: 16px;">♜</span><s> Games</s></div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Settings</div>
     <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⛭</span>Preferences</div>
@@ -497,7 +497,7 @@ body.compact .class-card { padding: 12px 14px; }
       </div>
     </div>
 
-    <!-- ── Import ── -->
+    <!-- ── Games ── -->
     <div id="panel-games" class="panel">
       <div class="page-title">Games</div>
       <div class="page-sub">Play games with good grades</div>
@@ -729,7 +729,7 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-const APP_VERSION = '0.7.0';
+const APP_VERSION = '0.7.1';
 const APP_RELEASE_DATE = '2026-09-22';
 const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -806,6 +806,7 @@ function nav(id) {
   if (id === 'calendar') renderCalendar();
   if (id === 'assignments') renderAssignments();
   if (id === 'import') renderImportedList();
+  if (id === 'games') renderGames();
   if (id === 'settings') { renderSettings(); }
 }
 
@@ -1498,6 +1499,13 @@ function renderImportedList() {
         </div>
       </div>`
     ).join('');
+}
+
+function renderGames() {
+  document.getElementById("panel-assignments").style.display = 'none'
+  document.getElementById('panel-games').style.display = 'block'
+  document.title = "GradeBook | Rewards";
+  toast('Under development!')
 }
 
 // ── Settings ─────────────────────────────────────────────────
