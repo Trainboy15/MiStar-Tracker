@@ -340,7 +340,7 @@ body.compact .class-card { padding: 12px 14px; }
     <div class="nav-item" onclick="nav('import')"><span class="nav-icon">⤒</span> Import</div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Rewards</div>
-    <div class="nav-item" onclick="nav('games')"><span class="nav-icon" style="color: #7c6ef4; text-shadow: 0 0 5px #7c6ef4, 0 0 10px #7c6ef4, 0 0 20px #7c6ef4, 0 0 40px #7c6ef4; size: 16px;">♜</span><s> Games</s></div>
+    <div class="nav-item" onclick="nav('games')"><span class="nav-icon" style="color:var(--accent); text-shadow: 0 0 5px; color:var(--accent) 0 0 10px; color:var(--accent) 0 0 20px; color:var(--accent) 0 0 40px; color:var(--accent); size: 16px;">♜</span><s> Games</s></div>
     <div class="sidebar-sep"></div>
     <div class="sidebar-label">Settings</div>
     <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⛭</span>Preferences</div>
@@ -753,7 +753,7 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-const APP_VERSION = '0.7.4';
+const APP_VERSION = '0.7.5';
 const APP_RELEASE_DATE = '2026-09-22';
 const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -1547,13 +1547,20 @@ function renderImportedList() {
 }
 
 
-function renderGames() {
-  //document.getElementById("panel-assignments").style.display = 'none';
-  //document.getElementById('panel-games').style.display = 'block';
-  //document.title = "GradeBook | Rewards";
-  
-  toast('Under Development!' ,false);
+async function renderGames() {
+    document.getElementById('panel-assignments').style.display = 'none';
+    document.getElementById('panel-games').style.display = 'block';
+    
+    const gameContainer = document.getElementById('game-container');
+    document.title = 'GradeBook | Rewards';
+    
+    const minesweeperRaw = await fetch('https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/minesweeper.html');
+    const minesweeperGame = await minesweeperRaw.text();
+    
+    gameContainer.innerHTML = minesweeperGame;
+    toast('Under Development!', false);
 }
+
 
 
 // ── Settings ─────────────────────────────────────────────────
@@ -1763,6 +1770,8 @@ function applySettings() {
 
   // Darken accent for accent2 (simple lightening via opacity trick)
   document.documentElement.style.setProperty('--accent2', settings.accentColor + 'cc');
+
+  document.getElementById('')
 
   // Compact mode
   document.body.classList.toggle('compact', !!settings.compactMode);
