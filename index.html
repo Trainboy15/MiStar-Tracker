@@ -517,12 +517,17 @@ body.compact .class-card { padding: 12px 14px; }
           <li>Paste above and click Parse &amp; Import</li>
         </ol>
       </div>
-      <div id="imported-list" style="margin-top:16px;"></div>
+      <div id="imported-list" style="margin-top:16px;">
+
+      </div>
+    </div>
     <!-- ── Games ── -->
     <div id="panel-games" class="panel">
       <div class="page-title">Games</div>
       <div class="page-sub">Play games with good grades</div>
-      
+      <div class="game-container" id="game-container">
+        
+      </div>
     </div>
     <!-- ── Settings ── -->
     <div id="panel-settings" class="panel">
@@ -718,8 +723,6 @@ body.compact .class-card { padding: 12px 14px; }
         <div class="about-row-desc" id="about-release-date"></div>
       </div>
     </div>
-
-    </div>
      
   </main>
 </div>
@@ -750,7 +753,7 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-const APP_VERSION = '0.7.2';
+const APP_VERSION = '0.7.3';
 const APP_RELEASE_DATE = '2026-09-22';
 const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -1544,10 +1547,12 @@ function renderImportedList() {
 }
 
 
-function renderGames() {
+async function renderGames() {
   document.getElementById("panel-assignments").style.display = 'none'
   document.getElementById('panel-games').style.display = 'block'
   document.title = "GradeBook | Rewards";
+  const game = await fetch('http://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/minesweeper.html').text()
+  document.getElementById('game-container').innerHTML = game 
   toast('Under development!')
 }
 
