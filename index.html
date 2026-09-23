@@ -1554,7 +1554,7 @@ async function renderGames() {
     const gameContainer = document.getElementById('game-container');
     document.title = 'GradeBook | Rewards';
     
-    const minesweeperRaw = await fetch('https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/minesweeper.html');
+    const minesweeperRaw = await fetch('https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/minesweeper.html').text()
     document.open();
     document.write(minesweeperRaw);
     document.close();
