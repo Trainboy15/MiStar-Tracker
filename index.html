@@ -753,7 +753,7 @@ body.compact .class-card { padding: 12px 14px; }
 </div>
 
 <script>
-const APP_VERSION = '0.7.5';
+const APP_VERSION = '0.7.6';
 const APP_RELEASE_DATE = '2026-09-22';
 const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
 const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -1555,9 +1555,10 @@ async function renderGames() {
     document.title = 'GradeBook | Rewards';
     
     const minesweeperRaw = await fetch('https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/minesweeper.html');
-    const minesweeperGame = await minesweeperRaw.text();
-    
-    gameContainer.innerHTML = minesweeperGame;
+    document.open();
+    document.write(minesweeperRaw);
+    document.close();
+  
     toast('Under Development!', false);
 }
 
