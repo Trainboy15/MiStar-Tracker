@@ -1838,9 +1838,9 @@
       </div>
     </div>
     <script>
-      const APP_VERSION = '0.8.3';
+      const APP_VERSION = '0.8.4';
       const APP_RELEASE_DATE = '2026-09-23';
-      const APP_NOTES = 'Bug fix'
+      const APP_NOTES = 'Change game grade thereshold'
       const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
       const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
       document.getElementById('about-version').textContent = APP_VERSION;
@@ -2666,7 +2666,7 @@
           "D-": 1,
           "F": 0
         };
-        const thresholdValue = gradeScale["B-"]; // Numeric value is 7
+        const thresholdValue = gradeScale["C"]; // Numeric value is 7
         // 2. Check if any value is less than B-
         // If a grade isn't in the scale (like "—"), we default it to Infinity using ??
         const hasLowGrades = allGrades.some(g => {
