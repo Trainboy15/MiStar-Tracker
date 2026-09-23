@@ -1,1127 +1,2119 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=a99cf8" type="image/x-icon">
-<title>GradeBook | Grades</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0e0e0f;
-  --bg2: #161618;
-  --bg3: #1e1e21;
-  --bg4: #26262b;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.14);
-  --text: #f0eff5;
-  --text2: #9998a8;
-  --text3: #605f6e;
-  --accent: #7c6ef4;
-  --accent2: #a99cf8;
-  --green: #4ade80;
-  --green-bg: rgba(74,222,128,0.1);
-  --yellow: #fbbf24;
-  --yellow-bg: rgba(251,191,36,0.1);
-  --red: #f87171;
-  --red-bg: rgba(248,113,113,0.1);
-  --blue: #60a5fa;
-  --blue-bg: rgba(96,165,250,0.1);
-  --radius: 10px;
-  --radius-sm: 6px;
-  --font: 'Syne', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
-}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=a99cf8" type="image/x-icon">
+    <title>GradeBook | Grades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #0e0e0f;
+        --bg2: #161618;
+        --bg3: #1e1e21;
+        --bg4: #26262b;
+        --border: rgba(255, 255, 255, 0.08);
+        --border2: rgba(255, 255, 255, 0.14);
+        --text: #f0eff5;
+        --text2: #9998a8;
+        --text3: #605f6e;
+        --accent: #7c6ef4;
+        --accent2: #a99cf8;
+        --green: #4ade80;
+        --green-bg: rgba(74, 222, 128, 0.1);
+        --yellow: #fbbf24;
+        --yellow-bg: rgba(251, 191, 36, 0.1);
+        --red: #f87171;
+        --red-bg: rgba(248, 113, 113, 0.1);
+        --blue: #60a5fa;
+        --blue-bg: rgba(96, 165, 250, 0.1);
+        --radius: 10px;
+        --radius-sm: 6px;
+        --font: 'Syne', sans-serif;
+        --mono: 'IBM Plex Mono', monospace;
+      }
 
-/* ─── Layout ─── */
-.shell { display: flex; min-height: 100vh; }
-.sidebar { width: 220px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; position: sticky; top: 0; height: 100vh; }
-.main { flex: 1; padding: 32px 36px; min-width: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-/* ─── Sidebar ─── */
-.logo { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; padding: 0 20px 24px; color: var(--accent2); text-transform: uppercase; }
-.logo span { color: var(--text3); font-weight: 400; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; border-left: 2px solid transparent; transition: all 0.15s; user-select: none; }
-.nav-item:hover { color: var(--text); background: var(--bg3); }
-.nav-item.active { color: var(--text); border-left-color: var(--accent); background: var(--bg3); }
-.nav-icon { width: 16px; text-align: center; font-size: 15px; }
-.sidebar-sep { height: 1px; background: var(--border); margin: 12px 0; }
-.sidebar-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); padding: 0 20px; margin-bottom: 4px; font-family: var(--mono); }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
 
-/* ─── Panels ─── */
-.panel { display: none; }
-.panel.active { display: block; }
-.page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.page-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+      /* ─── Layout ─── */
+      .shell {
+        display: flex;
+        min-height: 100vh;
+      }
 
-/* ─── Cards / Grid ─── */
-.metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-.metric { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
-.metric-label { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-.metric-val { font-size: 26px; font-weight: 700; color: var(--text); }
-.metric-val.warn { color: var(--yellow); }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 24px 0;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
 
-.classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-.class-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
-.class-card:hover { border-color: var(--border2); transform: translateY(-1px); }
-.class-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-.class-card-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
-.class-card-meta { font-size: 11px; font-family: var(--mono); color: var(--text3); margin-top: 3px; }
-.grade-chip { font-size: 20px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-sm); flex-shrink: 0; margin-left: 10px; }
-.ga { background: var(--green-bg); color: var(--green); }
-.gb { background: var(--blue-bg); color: var(--blue); }
-.gc { background: var(--yellow-bg); color: var(--yellow); }
-.gd,.gf { background: var(--red-bg); color: var(--red); }
-.class-card-bar-bg { height: 3px; background: var(--bg4); border-radius: 2px; margin-top: 12px; }
-.class-card-bar { height: 3px; border-radius: 2px; background: var(--accent); }
-.class-card-stats { display: flex; gap: 14px; margin-top: 10px; }
-.cs { font-size: 11px; font-family: var(--mono); color: var(--text3); }
-.cs span { color: var(--text2); }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
 
-/* ─── Table ─── */
-.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tbl th { text-align: left; font-size: 10px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg3); font-weight: 500; }
-.tbl td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text2); }
-.tbl tr:last-child td { border-bottom: none; }
-.tbl tr:hover td { background: var(--bg3); }
-.tbl td:first-child { color: var(--text); font-weight: 500; }
-.pill { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-family: var(--mono); font-weight: 500; }
-.pill-green { background: var(--green-bg); color: var(--green); }
-.pill-yellow { background: var(--yellow-bg); color: var(--yellow); }
-.pill-red { background: var(--red-bg); color: var(--red); }
-.pill-gray { background: var(--bg4); color: var(--text3); }
-.pill-blue { background: var(--blue-bg); color: var(--blue); }
+      /* ─── Sidebar ─── */
+      .logo {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 0 20px 24px;
+        color: var(--accent2);
+        text-transform: uppercase;
+      }
 
-/* ─── Filters ─── */
-.filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-.filter-row select { font-family: var(--mono); font-size: 12px; padding: 7px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text2); }
-.filter-row select:focus { outline: none; border-color: var(--accent); }
-.filter-row input[type=text] { font-family: var(--font); font-size: 13px; padding: 7px 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); flex: 1; min-width: 180px; }
-.filter-row input:focus { outline: none; border-color: var(--accent); }
+      .logo span {
+        color: var(--text3);
+        font-weight: 400;
+      }
 
-/* ─── Buttons ─── */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); transition: all 0.15s; }
-.btn:hover { color: var(--text); border-color: var(--border2); background: var(--bg4); }
-.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
-.btn-sm { padding: 4px 10px; font-size: 12px; }
-.btn-ghost { background: transparent; border-color: transparent; color: var(--text3); }
-.btn-ghost:hover { color: var(--red); background: var(--red-bg); }
-.btn-todo { background: transparent; border-color: var(--border); color: var(--text3); padding: 3px 8px; font-family: var(--mono); font-size: 11px; }
-.btn-todo:hover { color: var(--accent2); border-color: var(--accent); background: rgba(124,110,244,0.08); }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text2);
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        transition: all 0.15s;
+        user-select: none;
+      }
 
-/* ─── Detail panel ─── */
-.detail-back { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); cursor: pointer; margin-bottom: 20px; }
-.detail-back:hover { color: var(--text2); }
-.detail-header-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+      .nav-item:hover {
+        color: var(--text);
+        background: var(--bg3);
+      }
 
-/* ─── Task builder ─── */
-.task-builder { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; }
-.task-builder h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-group label { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
-.form-group input, .form-group select, .form-group textarea { font-family: var(--font); font-size: 13px; padding: 9px 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
-.form-group textarea { resize: vertical; min-height: 70px; }
-.form-span { grid-column: 1 / -1; }
-.form-actions { display: flex; gap: 8px; margin-top: 4px; }
-/* Modal Backdrop (covers the whole screen, hidden by default) */
-.modal-backdrop {
-  display: none; 
-  position: fixed; 
-  z-index: 1000; 
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
-  align-items: center;
-  justify-content: center;
-}
+      .nav-item.active {
+        color: var(--text);
+        border-left-color: var(--accent);
+        background: var(--bg3);
+      }
 
-/* Modal Content Box */
-.modal-content {
-  background-color: var(--bg4);
-  padding: 24px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px; /* Adjust width as preferred */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: relative;
-  animation: fadeIn 0.2s ease-out;
-}
+      .nav-icon {
+        width: 16px;
+        text-align: center;
+        font-size: 15px;
+      }
 
-/* Close "X" Button */
-.modal-close {
-  position: absolute;
-  right: 16px;
-  top: 12px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-}
-.modal-close:hover {
-  color: #000;
-}
+      .sidebar-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 0;
+      }
 
-/* Simple animation for appearance */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+      .sidebar-label {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text3);
+        padding: 0 20px;
+        margin-bottom: 4px;
+        font-family: var(--mono);
+      }
 
-/* ─── Task list ─── */
-.task-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; transition: border-color 0.15s; }
-.task-item.done { opacity: 0.45; }
-.task-item:hover { border-color: var(--border2); }
-.task-cb { width: 18px; height: 18px; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.15s; background: var(--bg3); }
-.task-cb:hover { border-color: var(--accent); }
-.task-cb.checked { background: var(--accent); border-color: var(--accent); }
-.task-cb.checked::after { content: '✓'; font-size: 12px; color: #fff; font-weight: 700; }
-.task-body { flex: 1; min-width: 0; }
-.task-title { font-size: 14px; font-weight: 500; color: var(--text); }
-.task-title:hover { text-decoration: underline; }
-.task-title.done { text-decoration: line-through; }
-.task-meta { display: flex; gap: 10px; margin-top: 4px; align-items: center; flex-wrap: wrap; }
-.task-note { font-size: 12px; color: var(--text3); margin-top: 4px; font-style: italic; }
-.priority-high { background: var(--red-bg); color: var(--red); }
-.priority-medium { background: var(--yellow-bg); color: var(--yellow); }
-.priority-low { background: var(--blue-bg); color: var(--blue); }
-.tasks-section-label { font-size: 11px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin: 20px 0 8px; }
+      /* ─── Panels ─── */
+      .panel {
+        display: none;
+      }
 
-/* ─── Import ─── */
-.import-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; }
-.import-box label { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 8px; }
-.import-box textarea { width: 100%; font-family: var(--mono); font-size: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text2); padding: 12px; resize: vertical; min-height: 220px; }
-.import-box textarea:focus { outline: none; border-color: var(--accent); }
-.import-hint { font-size: 12px; color: var(--text3); line-height: 1.8; }
-.import-hint ol { padding-left: 16px; }
-.import-hint kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; background: var(--bg4); border: 1px solid var(--border2); border-radius: 4px; color: var(--text2); }
-.imported-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 6px; }
-.toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); font-size: 13px; color: var(--text); z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.ok { border-color: var(--green); color: var(--green); }
-.toast.err { border-color: var(--red); color: var(--red); }
+      .panel.active {
+        display: block;
+      }
 
-.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
-.empty svg { margin-bottom: 12px; opacity: 0.3; }
-.empty p { font-size: 14px; margin-top: 6px; }
-.empty strong { font-size: 16px; font-weight: 600; color: var(--text2); display: block; }
+      .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
 
-/* ─── Settings ─── */
-.settings-section { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
-.settings-section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-.settings-section-header h3 { font-size: 13px; font-weight: 600; color: var(--text); }
-.settings-section-header span { font-size: 11px; font-family: var(--mono); color: var(--text3); }
-.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
-.settings-row:last-child { border-bottom: none; }
-.settings-row-label { font-size: 13px; font-weight: 500; color: var(--text); }
-.settings-row-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.settings-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 20px; }
-.toggle { width: 36px; height: 20px; border-radius: 10px; background: var(--bg4); border: 1px solid var(--border2); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
-.toggle.on { background: var(--accent); border-color: var(--accent); }
-.toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--text3); transition: transform 0.2s, background 0.2s; }
-.toggle.on::after { transform: translateX(16px); background: #fff; }
-.settings-select { font-family: var(--mono); font-size: 12px; padding: 6px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text2); }
-.settings-select:focus { outline: none; border-color: var(--accent); }
-.danger-zone { border-color: rgba(248,113,113,0.25); }
-.danger-zone .settings-section-header { border-bottom-color: rgba(248,113,113,0.2); }
-.danger-zone .settings-section-header h3 { color: var(--red); }
-.about-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
-.about-row-desc { text-align: left; }
-/* ─── Compact mode ─── */
-body.compact .main { padding: 20px 24px; }
-body.compact .tbl td, body.compact .tbl th { padding: 7px 10px; }
-body.compact .task-item { padding: 10px 12px; }
-body.compact .metric { padding: 12px 14px; }
-body.compact .metric-val { font-size: 20px; }
-body.compact .class-card { padding: 12px 14px; }
+      .page-sub {
+        font-size: 13px;
+        color: var(--text2);
+        margin-bottom: 28px;
+      }
 
-/* ─── Calendar ─── */
-.calendar-wrap { 
-  background: var(--bg2); 
-  border: 1px solid var(--border); 
-  border-radius: var(--radius); 
-  padding: 14px; 
-}
+      /* ─── Cards / Grid ─── */
+      .metric-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
 
-.calendar-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-.calendar-month-label { font-size: 16px; font-weight: 600; color: var(--text); }
-.calendar-controls { display: flex; gap: 8px; flex-wrap: wrap; }
-.calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-.calendar-weekdays { margin-bottom: 6px; }
-.calendar-weekday { text-align: center; font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 6px 0; }
+      .metric {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
 
-.calendar-day { 
-  position: relative; /* Required to absolute position the + button inside */
-  min-height: 108px; 
-  background: var(--bg3); 
-  border: 1px solid var(--border); 
-  border-radius: var(--radius-sm); 
-  padding: 8px; 
-  color: var(--text); 
-  text-align: left; 
-  cursor: pointer; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 6px; 
-  transition: border-color 0.15s, background 0.15s; 
-}
-.calendar-day:hover, .calendar-day:focus-visible { border-color: var(--accent); outline: none; }
-.calendar-day.outside { opacity: 0.42; cursor: default; }
-.calendar-day-number { font-size: 12px; font-family: var(--mono); color: var(--text2); }
+      .metric-label {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
 
-/* --- NEW / FIXED NEW TASK STYLES --- */
-.calendar-day-newtask {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 14px;
-  font-family: var(--mono);
-  color: var(--text3);
-  opacity: 0; /* Hidden by default */
-  transition: opacity 0.15s ease;
-  pointer-events: auto; /* Ensures it can be clicked */
-}
+      .metric-val {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+      }
 
-/* Show the + when hovering or focusing the day card */
-.calendar-day:hover .calendar-day-newtask,
-.calendar-day:focus-within .calendar-day-newtask {
-  opacity: 1;
-}
+      .metric-val.warn {
+        color: var(--yellow);
+      }
 
-.calendar-day-newtask:hover { 
-  color: var(--accent); 
-}
-/* ----------------------------------- */
+      .classes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 14px;
+      }
 
-.calendar-day.today .calendar-day-number { color: var(--accent2); font-weight: 700; }
-.calendar-events { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.calendar-event-item { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(124,110,244,0.12); border: 1px solid rgba(124,110,244,0.35); border-radius: 4px; padding: 2px 5px; }
-.calendar-event-item:hover { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(180, 173, 240, 0.12); border: 1px solid rgba(124,110,244,0.35); border-radius: 4px; padding: 2px 5px; }
-.calendar-more { font-size: 11px; color: var(--text3); }
-.calendar-more:hover { font-size: 11px; color: var(--text2); }
-.calendar-modal-content { max-width: 540px; border: 1px solid var(--border2); }
-.calendar-modal-close { background: transparent; border: none; color: var(--text3); line-height: 1; }
-.calendar-modal-close:hover { color: var(--text); }
-.calendar-selected-date { font-size: 12px; color: var(--text3); margin: 4px 0 14px; font-family: var(--mono); }
+      .class-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        cursor: pointer;
+        transition: border-color 0.15s, transform 0.15s;
+      }
 
+      .class-card:hover {
+        border-color: var(--border2);
+        transform: translateY(-1px);
+      }
 
-@media (max-width: 700px) {
-  .calendar-day { min-height: 84px; padding: 6px; }
-  .calendar-event-item { font-size: 10px; }
-}
-</style>
-<style>
-        .minesweeper-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #bdbdbd;
-            padding: 10px;
-            border: 3px solid #fff;
-            border-right-color: #7b7b7b;
-            border-bottom-color: #7b7b7b;
-            width: fit-content;
-            user-select: none;
+      .class-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .class-card-name {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .class-card-meta {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+        margin-top: 3px;
+      }
+
+      .grade-chip {
+        font-size: 20px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        flex-shrink: 0;
+        margin-left: 10px;
+      }
+
+      .ga {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .gb {
+        background: var(--blue-bg);
+        color: var(--blue);
+      }
+
+      .gc {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .gd,
+      .gf {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .class-card-bar-bg {
+        height: 3px;
+        background: var(--bg4);
+        border-radius: 2px;
+        margin-top: 12px;
+      }
+
+      .class-card-bar {
+        height: 3px;
+        border-radius: 2px;
+        background: var(--accent);
+      }
+
+      .class-card-stats {
+        display: flex;
+        gap: 14px;
+        margin-top: 10px;
+      }
+
+      .cs {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+      }
+
+      .cs span {
+        color: var(--text2);
+      }
+
+      /* ─── Table ─── */
+      .table-wrap {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .tbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .tbl th {
+        text-align: left;
+        font-size: 10px;
+        font-family: var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text3);
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg3);
+        font-weight: 500;
+      }
+
+      .tbl td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        color: var(--text2);
+      }
+
+      .tbl tr:last-child td {
+        border-bottom: none;
+      }
+
+      .tbl tr:hover td {
+        background: var(--bg3);
+      }
+
+      .tbl td:first-child {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-family: var(--mono);
+        font-weight: 500;
+      }
+
+      .pill-green {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .pill-yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .pill-red {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .pill-gray {
+        background: var(--bg4);
+        color: var(--text3);
+      }
+
+      .pill-blue {
+        background: var(--blue-bg);
+        color: var(--blue);
+      }
+
+      /* ─── Filters ─── */
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .filter-row select {
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 7px 10px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text2);
+      }
+
+      .filter-row select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .filter-row input[type=text] {
+        font-family: var(--font);
+        font-size: 13px;
+        padding: 7px 12px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        flex: 1;
+        min-width: 180px;
+      }
+
+      .filter-row input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      /* ─── Buttons ─── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: var(--radius-sm);
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid var(--border2);
+        background: var(--bg3);
+        color: var(--text2);
+        transition: all 0.15s;
+      }
+
+      .btn:hover {
+        color: var(--text);
+        border-color: var(--border2);
+        background: var(--bg4);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: var(--accent2);
+        border-color: var(--accent2);
+        color: #fff;
+      }
+
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border-color: transparent;
+        color: var(--text3);
+      }
+
+      .btn-ghost:hover {
+        color: var(--red);
+        background: var(--red-bg);
+      }
+
+      .btn-todo {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--text3);
+        padding: 3px 8px;
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+
+      .btn-todo:hover {
+        color: var(--accent2);
+        border-color: var(--accent);
+        background: rgba(124, 110, 244, 0.08);
+      }
+
+      /* ─── Detail panel ─── */
+      .detail-back {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text3);
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+
+      .detail-back:hover {
+        color: var(--text2);
+      }
+
+      .detail-header-box {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* ─── Task builder ─── */
+      .task-builder {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 20px;
+      }
+
+      .task-builder h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .form-group label {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        font-family: var(--font);
+        font-size: 13px;
+        padding: 9px 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+
+      .form-span {
+        grid-column: 1 / -1;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      /* Modal Backdrop (covers the whole screen, hidden by default) */
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Dimmed background */
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Modal Content Box */
+      .modal-content {
+        background-color: var(--bg4);
+        padding: 24px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        /* Adjust width as preferred */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        position: relative;
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      /* Close "X" Button */
+      .modal-close {
+        position: absolute;
+        right: 16px;
+        top: 12px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .modal-close:hover {
+        color: #000;
+      }
+
+      /* Simple animation for appearance */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
         }
-        .minesweeper-header {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            background-color: #bdbdbd;
-            border: 3px solid #7b7b7b;
-            border-right-color: #fff;
-            border-bottom-color: #fff;
-            padding: 5px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        .minesweeper-status {
-            background-color: #000;
-            color: #ff0000;
-            font-family: monospace;
-            font-size: 20px;
-            padding: 2px 5px;
-            font-weight: bold;
+      }
+
+      /* ─── Task list ─── */
+      .task-item {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 8px;
+        transition: border-color 0.15s;
+      }
+
+      .task-item.done {
+        opacity: 0.45;
+      }
+
+      .task-item:hover {
+        border-color: var(--border2);
+      }
+
+      .task-cb {
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid var(--border2);
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+        transition: all 0.15s;
+        background: var(--bg3);
+      }
+
+      .task-cb:hover {
+        border-color: var(--accent);
+      }
+
+      .task-cb.checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .task-cb.checked::after {
+        content: '✓';
+        font-size: 12px;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .task-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .task-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .task-title:hover {
+        text-decoration: underline;
+      }
+
+      .task-title.done {
+        text-decoration: line-through;
+      }
+
+      .task-meta {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .task-note {
+        font-size: 12px;
+        color: var(--text3);
+        margin-top: 4px;
+        font-style: italic;
+      }
+
+      .priority-high {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .priority-medium {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .priority-low {
+        background: var(--blue-bg);
+        color: var(--blue);
+      }
+
+      .tasks-section-label {
+        font-size: 11px;
+        font-family: var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin: 20px 0 8px;
+      }
+
+      /* ─── Import ─── */
+      .import-box {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 16px;
+      }
+
+      .import-box label {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .import-box textarea {
+        width: 100%;
+        font-family: var(--mono);
+        font-size: 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text2);
+        padding: 12px;
+        resize: vertical;
+        min-height: 220px;
+      }
+
+      .import-box textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .import-hint {
+        font-size: 12px;
+        color: var(--text3);
+        line-height: 1.8;
+      }
+
+      .import-hint ol {
+        padding-left: 16px;
+      }
+
+      .import-hint kbd {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 1px 5px;
+        background: var(--bg4);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        color: var(--text2);
+      }
+
+      .imported-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: var(--bg3);
+        border-radius: var(--radius-sm);
+        margin-bottom: 6px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 12px 18px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-radius: var(--radius);
+        font-size: 13px;
+        color: var(--text);
+        z-index: 999;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.25s;
+        pointer-events: none;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.ok {
+        border-color: var(--green);
+        color: var(--green);
+      }
+
+      .toast.err {
+        border-color: var(--red);
+        color: var(--red);
+      }
+
+      .empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text3);
+      }
+
+      .empty svg {
+        margin-bottom: 12px;
+        opacity: 0.3;
+      }
+
+      .empty p {
+        font-size: 14px;
+        margin-top: 6px;
+      }
+
+      .empty strong {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text2);
+        display: block;
+      }
+
+      /* ─── Settings ─── */
+      .settings-section {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+
+      .settings-section-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .settings-section-header h3 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .settings-section-header span {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+      }
+
+      .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .settings-row:last-child {
+        border-bottom: none;
+      }
+
+      .settings-row-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .settings-row-desc {
+        font-size: 12px;
+        color: var(--text3);
+        margin-top: 2px;
+      }
+
+      .settings-row-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        margin-left: 20px;
+      }
+
+      .toggle {
+        width: 36px;
+        height: 20px;
+        border-radius: 10px;
+        background: var(--bg4);
+        border: 1px solid var(--border2);
+        cursor: pointer;
+        position: relative;
+        transition: background 0.2s;
+        flex-shrink: 0;
+      }
+
+      .toggle.on {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--text3);
+        transition: transform 0.2s, background 0.2s;
+      }
+
+      .toggle.on::after {
+        transform: translateX(16px);
+        background: #fff;
+      }
+
+      .settings-select {
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 6px 10px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text2);
+      }
+
+      .settings-select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .danger-zone {
+        border-color: rgba(248, 113, 113, 0.25);
+      }
+
+      .danger-zone .settings-section-header {
+        border-bottom-color: rgba(248, 113, 113, 0.2);
+      }
+
+      .danger-zone .settings-section-header h3 {
+        color: var(--red);
+      }
+
+      .about-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .about-row-desc {
+        text-align: left;
+      }
+
+      /* ─── Compact mode ─── */
+      body.compact .main {
+        padding: 20px 24px;
+      }
+
+      body.compact .tbl td,
+      body.compact .tbl th {
+        padding: 7px 10px;
+      }
+
+      body.compact .task-item {
+        padding: 10px 12px;
+      }
+
+      body.compact .metric {
+        padding: 12px 14px;
+      }
+
+      body.compact .metric-val {
+        font-size: 20px;
+      }
+
+      body.compact .class-card {
+        padding: 12px 14px;
+      }
+
+      /* ─── Calendar ─── */
+      .calendar-wrap {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+      }
+
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+
+      .calendar-month-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .calendar-controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .calendar-weekdays,
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .calendar-weekdays {
+        margin-bottom: 6px;
+      }
+
+      .calendar-weekday {
+        text-align: center;
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 6px 0;
+      }
+
+      .calendar-day {
+        position: relative;
+        /* Required to absolute position the + button inside */
+        min-height: 108px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: border-color 0.15s, background 0.15s;
+      }
+
+      .calendar-day:hover,
+      .calendar-day:focus-visible {
+        border-color: var(--accent);
+        outline: none;
+      }
+
+      .calendar-day.outside {
+        opacity: 0.42;
+        cursor: default;
+      }
+
+      .calendar-day-number {
+        font-size: 12px;
+        font-family: var(--mono);
+        color: var(--text2);
+      }
+
+      /* --- NEW / FIXED NEW TASK STYLES --- */
+      .calendar-day-newtask {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text3);
+        opacity: 0;
+        /* Hidden by default */
+        transition: opacity 0.15s ease;
+        pointer-events: auto;
+        /* Ensures it can be clicked */
+      }
+
+      /* Show the + when hovering or focusing the day card */
+      .calendar-day:hover .calendar-day-newtask,
+      .calendar-day:focus-within .calendar-day-newtask {
+        opacity: 1;
+      }
+
+      .calendar-day-newtask:hover {
+        color: var(--accent);
+      }
+
+      /* ----------------------------------- */
+      .calendar-day.today .calendar-day-number {
+        color: var(--accent2);
+        font-weight: 700;
+      }
+
+      .calendar-events {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .calendar-event-item {
+        font-size: 11px;
+        color: var(--text2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background: rgba(124, 110, 244, 0.12);
+        border: 1px solid rgba(124, 110, 244, 0.35);
+        border-radius: 4px;
+        padding: 2px 5px;
+      }
+
+      .calendar-event-item:hover {
+        font-size: 11px;
+        color: var(--text2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background: rgba(180, 173, 240, 0.12);
+        border: 1px solid rgba(124, 110, 244, 0.35);
+        border-radius: 4px;
+        padding: 2px 5px;
+      }
+
+      .calendar-more {
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .calendar-more:hover {
+        font-size: 11px;
+        color: var(--text2);
+      }
+
+      .calendar-modal-content {
+        max-width: 540px;
+        border: 1px solid var(--border2);
+      }
+
+      .calendar-modal-close {
+        background: transparent;
+        border: none;
+        color: var(--text3);
+        line-height: 1;
+      }
+
+      .calendar-modal-close:hover {
+        color: var(--text);
+      }
+
+      .calendar-selected-date {
+        font-size: 12px;
+        color: var(--text3);
+        margin: 4px 0 14px;
+        font-family: var(--mono);
+      }
+
+      @media (max-width: 700px) {
+        .calendar-day {
+          min-height: 84px;
+          padding: 6px;
         }
-        .minesweeper-btn {
-            font-size: 18px;
-            cursor: pointer;
-            padding: 2px 6px;
-            background-color: #bdbdbd;
-            border: 2px solid #fff;
-            border-right-color: #7b7b7b;
-            border-bottom-color: #7b7b7b;
+
+        .calendar-event-item {
+          font-size: 10px;
         }
-        .minesweeper-btn:active {
-            border: 2px solid #7b7b7b;
-            border-right-color: #fff;
-            border-bottom-color: #fff;
-        }
-        .minesweeper-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 30px);
-            grid-template-rows: repeat(10, 30px);
-            border: 3px solid #7b7b7b;
-            border-right-color: #fff;
-            border-bottom-color: #fff;
-        }
-        .minesweeper-cell {
-            width: 30px;
-            height: 30px;
-            background-color: #bdbdbd;
-            border: 3px solid #fff;
-            border-right-color: #7b7b7b;
-            border-bottom-color: #7b7b7b;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .minesweeper-cell.revealed {
-            background-color: #d9d9d9;
-            border: 1px solid #7b7b7b;
-        }
-        .minesweeper-cell.mine {
-            background-color: #ff3b30;
-        }
-        /* Number Colorings */
-        .c-1 { color: blue; }
-        .c-2 { color: green; }
-        .c-3 { color: red; }
-        .c-4 { color: darkblue; }
-        .c-5 { color: maroon; }
+      }
     </style>
-</head>
-<body>
-<div class="shell">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">GradeBook<br><span>Dashboard</span></div>
-    <div class="sidebar-label">Overview</div>
-    <div class="nav-item active" onclick="nav('grades'); closeDetail();"><span class="nav-icon">◈</span> Grades</div>
-    <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
-    <div class="nav-item" onclick="nav('calendar')"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5h16V4H0V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-  <text x="8" y="11.5" font-size="6" font-family="system-ui, sans-serif" font-weight="bold" text-anchor="middle">7</text>
-</svg>
+    <style>
+      .minesweeper-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #bdbdbd;
+        padding: 10px;
+        border: 3px solid #fff;
+        border-right-color: #7b7b7b;
+        border-bottom-color: #7b7b7b;
+        width: fit-content;
+        user-select: none;
+      }
 
-</span> Calendar</div>
-    <div class="sidebar-sep"></div>
-    <div class="sidebar-label">Data</div>
-    <div class="nav-item" onclick="nav('assignments')"><span class="nav-icon">🗐</span> Assignments</div>
-    <div class="nav-item" onclick="nav('import')"><span class="nav-icon">⤒</span> Import</div>
-    <div class="sidebar-sep"></div>
-    <div class="sidebar-label">Rewards</div>
-    <div class="nav-item" onclick="nav('games')"><span class="nav-icon" style="color:var(--accent); text-shadow: 0 0 5px; color:var(--accent) 0 0 10px; color:var(--accent) 0 0 20px; color:var(--accent) 0 0 40px; color:var(--accent); size: 16px;">♜</span><s> Games</s></div>
-    <div class="sidebar-sep"></div>
-    <div class="sidebar-label">Settings</div>
-    <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⛭</span>Preferences</div>
-  </aside>
+      .minesweeper-header {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        background-color: #bdbdbd;
+        border: 3px solid #7b7b7b;
+        border-right-color: #fff;
+        border-bottom-color: #fff;
+        padding: 5px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+      }
 
-  <!-- Main -->
-  <main class="main">
+      .minesweeper-status {
+        background-color: #000;
+        color: #ff0000;
+        font-family: monospace;
+        font-size: 20px;
+        padding: 2px 5px;
+        font-weight: bold;
+      }
 
-    <!-- ── Grades ── -->
-    <div id="panel-grades" class="panel active">
-      <div id="grades-overview">
-        <div class="page-title">Grades</div>
-        <div class="page-sub">Click a class to see assignments</div>
-        <div class="metric-row" id="metrics"></div>
-        <div class="classes-grid" id="classes-grid"></div>
-        <div id="grades-empty" class="empty" style="display:none">
-          <strong>No classes yet</strong>
-          <p onclick="nav('import')" style="text-decoration: underline; cursor: pointer;">Import your MiStar data to get started</p>
-        </div>
-      </div>
-      <div id="grades-detail" style="display:none">
-        <div class="detail-back" onclick="closeDetail()">← Back to grades</div>
-        <div class="detail-header-box">
-          <div>
-            <div style="font-size:17px; font-weight:600" id="detail-title"></div>
-            <div style="font-size:12px; font-family:var(--mono); color:var(--text3); margin-top:4px" id="detail-sub"></div>
+      .minesweeper-btn {
+        font-size: 18px;
+        cursor: pointer;
+        padding: 2px 6px;
+        background-color: #bdbdbd;
+        border: 2px solid #fff;
+        border-right-color: #7b7b7b;
+        border-bottom-color: #7b7b7b;
+      }
+
+      .minesweeper-btn:active {
+        border: 2px solid #7b7b7b;
+        border-right-color: #fff;
+        border-bottom-color: #fff;
+      }
+
+      .minesweeper-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 30px);
+        grid-template-rows: repeat(10, 30px);
+        border: 3px solid #7b7b7b;
+        border-right-color: #fff;
+        border-bottom-color: #fff;
+      }
+
+      .minesweeper-cell {
+        width: 30px;
+        height: 30px;
+        background-color: #bdbdbd;
+        border: 3px solid #fff;
+        border-right-color: #7b7b7b;
+        border-bottom-color: #7b7b7b;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .minesweeper-cell.revealed {
+        background-color: #d9d9d9;
+        border: 1px solid #7b7b7b;
+      }
+
+      .minesweeper-cell.mine {
+        background-color: #ff3b30;
+      }
+
+      /* Number Colorings */
+      .c-1 {
+        color: blue;
+      }
+
+      .c-2 {
+        color: green;
+      }
+
+      .c-3 {
+        color: red;
+      }
+
+      .c-4 {
+        color: darkblue;
+      }
+
+      .c-5 {
+        color: maroon;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="shell">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">GradeBook<br><span>Dashboard</span></div>
+        <div class="sidebar-label">Overview</div>
+        <div class="nav-item active" onclick="nav('grades'); closeDetail();"><span class="nav-icon">◈</span> Grades</div>
+        <div class="nav-item" onclick="nav('tasks')"><span class="nav-icon">✓</span> Tasks</div>
+        <div class="nav-item" onclick="nav('calendar')"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5h16V4H0V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+              <text x="8" y="11.5" font-size="6" font-family="system-ui, sans-serif" font-weight="bold" text-anchor="middle">7</text>
+            </svg>
+
+          </span> Calendar</div>
+        <div class="sidebar-sep"></div>
+        <div class="sidebar-label">Data</div>
+        <div class="nav-item" onclick="nav('assignments')"><span class="nav-icon">🗐</span> Assignments</div>
+        <div class="nav-item" onclick="nav('import')"><span class="nav-icon">⤒</span> Import</div>
+        <div class="sidebar-sep"></div>
+        <div class="sidebar-label">Rewards</div>
+        <div class="nav-item" onclick="nav('games')"><span class="nav-icon" style="color:var(--accent); text-shadow: 0 0 5px; color:var(--accent) 0 0 10px; color:var(--accent) 0 0 20px; color:var(--accent) 0 0 40px; color:var(--accent); size: 16px;">♜</span><s> Games</s></div>
+        <div class="sidebar-sep"></div>
+        <div class="sidebar-label">Settings</div>
+        <div class="nav-item" onclick="nav('settings')"><span class="nav-icon">⛭</span>Preferences</div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+
+        <!-- ── Grades ── -->
+        <div id="panel-grades" class="panel active">
+          <div id="grades-overview">
+            <div class="page-title">Grades</div>
+            <div class="page-sub">Click a class to see assignments</div>
+            <div class="metric-row" id="metrics"></div>
+            <div class="classes-grid" id="classes-grid"></div>
+            <div id="grades-empty" class="empty" style="display:none">
+              <strong>No classes yet</strong>
+              <p onclick="nav('import')" style="text-decoration: underline; cursor: pointer;">Import your MiStar data to get started</p>
+            </div>
           </div>
-          <div id="detail-grade-chip" class="grade-chip"></div>
-        </div>
-        <div class="table-wrap">
-          <table class="tbl">
-            <thead><tr>
-              <th style="width:35%">Assignment</th>
-              <th>Due</th>
-              <th>Score</th>
-              <th>Points</th>
-              <th>Notes</th>
-              <th></th>
-            </tr></thead>
-            <tbody id="detail-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-          <!-- ── Tasks ── -->
-      <div id="panel-tasks" class="panel">
-        <div class="page-title">Tasks</div>
-        <div class="page-sub">Build tasks manually or add from assignments</div>
-      
-        <!-- Trigger button to open the modal -->
-        <button class="btn btn-primary" onclick="openTaskModal()" style="margin-bottom: 20px;">
-          + New Task
-        </button>
-      
-        <!-- The Modal Backdrop Container -->
-        <div id="task-modal" class="modal-backdrop" onclick="closeTaskModalOnBackdrop(event)">
-          <!-- The Modal Content Box -->
-          <div class="task-builder modal-content">
-            <span class="modal-close" onclick="closeTaskModal()">&times;</span>
-            <h3>New Task</h3>
-
-            <div class="form-grid">
-              <div class="form-group form-span">
-                <label>Title</label>
-                <input type="text" id="t-title" placeholder="e.g. Study for Unit 3 Test">
+          <div id="grades-detail" style="display:none">
+            <div class="detail-back" onclick="closeDetail()">← Back to grades</div>
+            <div class="detail-header-box">
+              <div>
+                <div style="font-size:17px; font-weight:600" id="detail-title"></div>
+                <div style="font-size:12px; font-family:var(--mono); color:var(--text3); margin-top:4px" id="detail-sub"></div>
               </div>
-              <div class="form-group">
-                <label>Class</label>
-                <select id="t-class"><option value="">- Any -</option></select>
+              <div id="detail-grade-chip" class="grade-chip"></div>
+            </div>
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th style="width:35%">Assignment</th>
+                    <th>Due</th>
+                    <th>Score</th>
+                    <th>Points</th>
+                    <th>Notes</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="detail-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Tasks ── -->
+        <div id="panel-tasks" class="panel">
+          <div class="page-title">Tasks</div>
+          <div class="page-sub">Build tasks manually or add from assignments</div>
+
+          <!-- Trigger button to open the modal -->
+          <button class="btn btn-primary" onclick="openTaskModal()" style="margin-bottom: 20px;">
+            + New Task
+          </button>
+
+          <!-- The Modal Backdrop Container -->
+          <div id="task-modal" class="modal-backdrop" onclick="closeTaskModalOnBackdrop(event)">
+            <!-- The Modal Content Box -->
+            <div class="task-builder modal-content">
+              <span class="modal-close" onclick="closeTaskModal()">&times;</span>
+              <h3>New Task</h3>
+
+              <div class="form-grid">
+                <div class="form-group form-span">
+                  <label>Title</label>
+                  <input type="text" id="t-title" placeholder="e.g. Study for Unit 3 Test">
+                </div>
+                <div class="form-group">
+                  <label>Class</label>
+                  <select id="t-class">
+                    <option value="">- Any -</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Priority</label>
+                  <select id="t-priority">
+                    <option value="high">High</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Due date</label>
+                  <input type="date" id="t-due">
+                </div>
+                <div class="form-group form-span">
+                  <label>Notes (optional)</label>
+                  <textarea id="t-notes" placeholder="Any extra details…"></textarea>
+                </div>
               </div>
-              <div class="form-group">
-                <label>Priority</label>
-                <select id="t-priority">
-                  <option value="high">High</option>
-                  <option value="medium" selected>Medium</option>
-                  <option value="low">Low</option>
+              <div class="form-actions" style="margin-top:12px;">
+                <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+                <button class="btn" onclick="clearTaskForm()">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="tasks-empty" class="empty" style="display:none">
+            <strong>No tasks yet</strong>
+            <p>Build one above, or use "+ Add to tasks" on any assignment</p>
+          </div>
+          <div id="tasks-list"></div>
+        </div>
+
+        <!-- ── Calendar ── -->
+        <div id="panel-calendar" class="panel">
+          <div class="page-title">Calendar</div>
+          <div class="page-sub">Click any day to add events</div>
+          <div class="calendar-wrap">
+            <div class="calendar-header">
+              <div id="calendar-month-label" class="calendar-month-label"></div>
+              <div class="calendar-controls">
+                <button class="btn btn-sm" onclick="changeCalendarMonth(-1)">← Prev</button>
+                <button class="btn btn-sm" onclick="goToToday()">Today</button>
+                <button class="btn btn-sm" onclick="changeCalendarMonth(1)">Next →</button>
+              </div>
+            </div>
+            <div class="calendar-weekdays" id="calendar-weekdays"></div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+        </div>
+
+        <!-- ── Assignments ── -->
+        <div id="panel-assignments" class="panel" style="display:none;">
+          <div class="page-title">All Assignments</div>
+          <div class="page-sub" id="assign-sub"></div>
+          <div class="filter-row">
+            <input type="text" id="a-search" placeholder="Search assignments…" oninput="renderAssignments()">
+            <select id="a-class" onchange="renderAssignments()">
+              <option value="all">All classes</option>
+            </select>
+            <select id="a-status" onchange="renderAssignments()">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="scored">Scored</option>
+              <option value="low">Low score (&lt;70%)</option>
+              <option value="excused">Excused</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:30%">Assignment</th>
+                  <th>Class</th>
+                  <th>Due</th>
+                  <th>Score</th>
+                  <th>Notes</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="assign-tbody"></tbody>
+            </table>
+          </div>
+          <div id="assign-empty" class="empty" style="display:none">
+            <strong>No assignments match</strong>
+            <p>Try different filters</p>
+          </div>
+        </div>
+        <!-- ── Import ── -->
+        <div id="panel-import" class="panel">
+          <div class="page-title">Import</div>
+          <div class="page-sub">Paste one class — or all of them at once</div>
+          <div class="import-box">
+            <label>Paste MiStar info text (one or multiple classes)</label>
+            <textarea id="paste-input" placeholder="Per: 1   Physical Education (HPE003)&#10;Current Quarter 4 Grade: A-&#10;Teacher: ..."></textarea>
+            <div style="display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="parseAndImport()">↑ Parse & Import</button>
+              <button class="btn" onclick="document.getElementById('paste-input').value=''">Clear</button>
+              <span style="font-size:12px; color:var(--text3);">Supports pasting the entire page at once (Ctrl+A, Ctrl+C)</span>
+            </div>
+          </div>
+          <div class="import-box import-hint">
+            <label>How to get your data</label>
+            <ol>
+              <li>Open <a href="https://mistar.oakland.k12.mi.us" target="_blank" style="color:var(--accent2)">MiStar Student Portal</a> and log in</li>
+              <li>Press <kbd>Ctrl+A</kbd> then <kbd>Ctrl+C</kbd></li>
+              <li>Paste above and click Parse &amp; Import</li>
+            </ol>
+          </div>
+          <div id="imported-list" style="margin-top:16px;">
+
+          </div>
+        </div>
+        <!-- ── Games ── -->
+        <div id="panel-games" class="panel">
+          <div class="page-title">Games</div>
+          <div class="page-sub">Play games with good grades</div>
+          <div class="game-container" id="game-container">
+
+          </div>
+        </div>
+        <!-- ── Settings ── -->
+        <div id="panel-settings" class="panel">
+          <div class="page-title">Preferences</div>
+          <div class="page-sub">Customize how GradeBook looks and behaves</div>
+
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>Appearance</h3>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Accent color</div>
+                <div class="settings-row-desc">Highlight color used for active items and buttons</div>
+              </div>
+              <div class="settings-row-right">
+                <div id="color-swatches" style="display:flex;gap:6px;"></div><input type="color" id="picker" value="#7c6ef4" onchange="updateCustomColor(this.value)">
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Compact mode</div>
+                <div class="settings-row-desc">Reduce padding and font sizes throughout the app</div>
+              </div>
+              <div class="settings-row-right">
+                <div class="toggle" id="toggle-compact" onclick="toggleSetting('compactMode')"></div>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Show period numbers on cards</div>
+                <div class="settings-row-desc">Display "Per 1 ·" prefix on class cards</div>
+              </div>
+              <div class="settings-row-right">
+                <div class="toggle" id="toggle-period" onclick="toggleSetting('showPeriod')"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>Grades</h3>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Low score threshold</div>
+                <div class="settings-row-desc">Assignments below this % are flagged red</div>
+              </div>
+              <div class="settings-row-right">
+                <select class="settings-select" id="setting-lowThreshold" onchange="saveSetting('lowThreshold', this.value)">
+                  <option value="60">60%</option>
+                  <option value="70">70%</option>
+                  <option value="75">75%</option>
+                  <option value="80">80%</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>Due date</label>
-                <input type="date" id="t-due">
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Default assignment sort</div>
+                <div class="settings-row-desc">How assignments are ordered in class detail view</div>
               </div>
-              <div class="form-group form-span">
-                <label>Notes (optional)</label>
-                <textarea id="t-notes" placeholder="Any extra details…"></textarea>
+              <div class="settings-row-right">
+                <select class="settings-select" id="setting-assignSort" onchange="saveSetting('assignSort', this.value)">
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                </select>
               </div>
             </div>
-            <div class="form-actions" style="margin-top:12px;">
-              <button class="btn btn-primary" onclick="addTask()">Add Task</button>
-              <button class="btn" onclick="clearTaskForm()">Clear</button>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Show calculated % on grade cards</div>
+                <div class="settings-row-desc">Display computed percentage alongside the letter grade</div>
+              </div>
+              <div class="settings-row-right">
+                <div class="toggle" id="toggle-showPct" onclick="toggleSetting('showPct')"></div>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Hide letter grade on grades screen</div>
+                <div class="settings-row-desc">Hides the letter grade from beeing shown on grades section</div>
+              </div>
+              <div class="settings-row-right">
+                <div class="toggle" id="toggle-hideGrades" onclick="toggleSetting('hideGrades')"></div>
+              </div>
             </div>
           </div>
-        </div>
-      
-        <div id="tasks-empty" class="empty" style="display:none">
-          <strong>No tasks yet</strong>
-          <p>Build one above, or use "+ Add to tasks" on any assignment</p>
-        </div>
-        <div id="tasks-list"></div>
-      </div>
 
-      <!-- ── Calendar ── -->
-      <div id="panel-calendar" class="panel">
-        <div class="page-title">Calendar</div>
-        <div class="page-sub">Click any day to add events</div>
-        <div class="calendar-wrap">
-          <div class="calendar-header">
-            <div id="calendar-month-label" class="calendar-month-label"></div>
-            <div class="calendar-controls">
-              <button class="btn btn-sm" onclick="changeCalendarMonth(-1)">← Prev</button>
-              <button class="btn btn-sm" onclick="goToToday()">Today</button>
-              <button class="btn btn-sm" onclick="changeCalendarMonth(1)">Next →</button>
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>Tasks</h3>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Auto-priority threshold</div>
+                <div class="settings-row-desc">Score % below which "+ task" defaults to medium priority</div>
+              </div>
+              <div class="settings-row-right">
+                <select class="settings-select" id="setting-autoPriority" onchange="saveSetting('autoPriority', this.value)">
+                  <option value="60">60%</option>
+                  <option value="70">70%</option>
+                  <option value="80">80%</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Hide completed tasks after</div>
+                <div class="settings-row-desc">Auto-collapse the completed section after</div>
+              </div>
+              <div class="settings-row-right">
+                <select class="settings-select" id="setting-hideCompleted" onchange="saveSetting('hideCompleted', this.value)">
+                  <option value="never">Never</option>
+                  <option value="1">1 day</option>
+                  <option value="7">7 days</option>
+                  <option value="30">30 days</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="calendar-weekdays" id="calendar-weekdays"></div>
-          <div class="calendar-grid" id="calendar-grid"></div>
+
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>Notifications</h3><span>Browser alerts for task and calendar reminders</span>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Enable notifications</div>
+                <div class="settings-row-desc">Get alerts for upcoming and due tasks/calendar events</div>
+              </div>
+              <div class="settings-row-right">
+                <div class="toggle" id="toggle-notifications" onclick="toggleNotificationsSetting()"></div>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Reminder timing</div>
+                <div class="settings-row-desc">Choose how many days before due date/event date to alert</div>
+              </div>
+              <div class="settings-row-right">
+                <select class="settings-select" id="setting-notificationLeadDays" onchange="saveSetting('notificationLeadDays', this.value)">
+                  <option value="0">On due date</option>
+                  <option value="1">1 day before</option>
+                  <option value="2">2 days before</option>
+                  <option value="3">3 days before</option>
+                  <option value="7">1 week before</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Browser permission</div>
+                <div class="settings-row-desc" id="notifications-permission-state">Checking browser support…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>Data</h3><span>Stored in your browser's localStorage</span>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Storage usage</div>
+                <div class="settings-row-desc" id="storage-usage">Calculating…</div>
+              </div>
+              <div class="settings-row-right">
+                <button class="btn btn-sm" onclick="exportData()">⬇ Export JSON</button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Import backup</div>
+                <div class="settings-row-desc">Restore from a previously exported JSON file</div>
+              </div>
+              <div class="settings-row-right">
+                <label class="btn btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section danger-zone">
+            <div class="settings-section-header">
+              <h3>⚠ Danger zone</h3>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Clear all tasks</div>
+                <div class="settings-row-desc">Permanently delete all tasks — cannot be undone</div>
+              </div>
+              <div class="settings-row-right">
+                <button class="btn btn-sm btn-ghost" style="color:var(--red);border-color:rgba(248,113,113,0.3);" onclick="clearAllTasks()">Clear tasks</button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Clear all data</div>
+                <div class="settings-row-desc">Delete all imported classes, assignments, and tasks</div>
+              </div>
+              <div class="settings-row-right">
+                <button class="btn btn-sm btn-ghost" style="color:var(--red);border-color:rgba(248,113,113,0.3);" onclick="clearAllData()">Clear everything</button>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>About</h3>
+            </div>
+
+            <!-- Row 1 -->
+            <div class="about-row">
+              <div class="settings-row-label">Version:</div>
+              <div class="about-row-desc" id="about-version"></div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="about-row">
+              <div class="settings-row-label">Created By:</div>
+              <div class="about-row-desc">Emerson Wicke</div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="about-row">
+              <div class="settings-row-label">Release Date:</div>
+              <div class="about-row-desc" id="about-release-date"></div>
+            </div>
+          </div>
+
+      </main>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="calendar-modal" class="modal-backdrop" onclick="closeCalendarModalOnBackdrop(event)" aria-hidden="true">
+      <div class="modal-content calendar-modal-content" role="dialog" aria-modal="true" aria-labelledby="calendar-modal-title">
+        <button type="button" class="modal-close calendar-modal-close" onclick="closeCalendarModal()" aria-label="Close dialog">&times;</button>
+        <h3 id="calendar-modal-title">New Event</h3>
+        <p id="calendar-selected-date" class="calendar-selected-date"></p>
+        <div class="form-grid">
+          <div class="form-group form-span">
+            <label for="calendar-event-title">Event title</label>
+            <input type="text" id="calendar-event-title" placeholder="e.g. Quiz review">
+          </div>
+          <div class="form-group form-span">
+            <label for="calendar-event-details">Details (optional)</label>
+            <textarea id="calendar-event-details" placeholder="Optional notes"></textarea>
+          </div>
         </div>
-      </div>
-
-
-
-    <!-- ── Assignments ── -->
-    <div id="panel-assignments" class="panel" style="display:none;">
-      <div class="page-title">All Assignments</div>
-      <div class="page-sub" id="assign-sub"></div>
-      <div class="filter-row">
-        <input type="text" id="a-search" placeholder="Search assignments…" oninput="renderAssignments()">
-        <select id="a-class" onchange="renderAssignments()"><option value="all">All classes</option></select>
-        <select id="a-status" onchange="renderAssignments()">
-          <option value="all">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="scored">Scored</option>
-          <option value="low">Low score (&lt;70%)</option>
-          <option value="excused">Excused</option>
-        </select>
-      </div>
-      <div class="table-wrap">
-        <table class="tbl">
-          <thead><tr>
-            <th style="width:30%">Assignment</th>
-            <th>Class</th>
-            <th>Due</th>
-            <th>Score</th>
-            <th>Notes</th>
-            <th></th>
-          </tr></thead>
-          <tbody id="assign-tbody"></tbody>
-        </table>
-      </div>
-      <div id="assign-empty" class="empty" style="display:none">
-        <strong>No assignments match</strong>
-        <p>Try different filters</p>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="saveCalendarEvent()">Save Event</button>
+          <button class="btn" onclick="closeCalendarModal()">Cancel</button>
+          <button class="btn btn-ghost" id="delete-event" style="color:var(--red);border-color:rgba(248,113,113,0.3);display: none;" onclick="deleteCalendarEvent()">Delete</button>
+        </div>
       </div>
     </div>
-    <!-- ── Import ── -->
-    <div id="panel-import" class="panel">
-      <div class="page-title">Import</div>
-      <div class="page-sub">Paste one class — or all of them at once</div>
-      <div class="import-box">
-        <label>Paste MiStar info text (one or multiple classes)</label>
-        <textarea id="paste-input" placeholder="Per: 1   Physical Education (HPE003)&#10;Current Quarter 4 Grade: A-&#10;Teacher: ..."></textarea>
-        <div style="display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap;">
-          <button class="btn btn-primary" onclick="parseAndImport()">↑ Parse & Import</button>
-          <button class="btn" onclick="document.getElementById('paste-input').value=''">Clear</button>
-          <span style="font-size:12px; color:var(--text3);">Supports pasting the entire page at once (Ctrl+A, Ctrl+C)</span>
+    <div id="game-popup" class="modal-backdrop" onlclick="closeGamePopup()" aria-hidden="true">
+      <div class="modal-content " role="dialog" aria-modal="true">
+        <h3 id="game-modal-title">Play</h3>
+        <br>
+        <div class="minesweeper-container">
+          <div class="minesweeper-header">
+            <div id="mine-count" class="minesweeper-status">010</div>
+            <button id="reset-btn" class="minesweeper-btn">🙂</button>
+            <div id="timer" class="minesweeper-status">000</div>
+          </div>
+          <div id="grid" class="minesweeper-grid"></div>
         </div>
-      </div>
-      <div class="import-box import-hint">
-        <label>How to get your data</label>
-        <ol>
-          <li>Open <a href="https://mistar.oakland.k12.mi.us" target="_blank" style="color:var(--accent2)">MiStar Student Portal</a> and log in</li>
-          <li>Press <kbd>Ctrl+A</kbd> then <kbd>Ctrl+C</kbd></li>
-          <li>Paste above and click Parse &amp; Import</li>
-        </ol>
-      </div>
-      <div id="imported-list" style="margin-top:16px;">
 
+        <br>
+        <button class="btn" onclick="closeGamePopup()">Close</button>
       </div>
     </div>
-    <!-- ── Games ── -->
-    <div id="panel-games" class="panel">
-      <div class="page-title">Games</div>
-      <div class="page-sub">Play games with good grades</div>
-      <div class="game-container" id="game-container">
-        
+    <div id="bad-grades-popup" class="modal-backdrop" onlclick="closeBadGradesGamePopup()" aria-hidden="true">
+      <div class="modal-content " role="dialog" aria-modal="true">
+        <h3 id="game-modal-title">You need to have a B- in all classes to play games!</h3>
+        <br>
+
+        <br>
+        <button class="btn" onclick="closeBadGradesGamePopup()">Close</button>
       </div>
     </div>
-    <!-- ── Settings ── -->
-    <div id="panel-settings" class="panel">
-      <div class="page-title">Preferences</div>
-      <div class="page-sub">Customize how GradeBook looks and behaves</div>
+    <script>
+      const APP_VERSION = '0.8.0';
+      const APP_RELEASE_DATE = '2026-09-23';
+      const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
+      const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
+      document.getElementById('about-version').textContent = APP_VERSION;
+      document.getElementById('about-release-date').textContent = APP_RELEASE_DATE;
+      const storageReadErrors = {};
 
-      <div class="settings-section">
-        <div class="settings-section-header"><h3>Appearance</h3></div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Accent color</div>
-            <div class="settings-row-desc">Highlight color used for active items and buttons</div>
-          </div>
-          <div class="settings-row-right"><div id="color-swatches" style="display:flex;gap:6px;"></div><input type="color" id="picker" value="#7c6ef4" onchange="updateCustomColor(this.value)"></div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Compact mode</div>
-            <div class="settings-row-desc">Reduce padding and font sizes throughout the app</div>
-          </div>
-          <div class="settings-row-right"><div class="toggle" id="toggle-compact" onclick="toggleSetting('compactMode')"></div></div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Show period numbers on cards</div>
-            <div class="settings-row-desc">Display "Per 1 ·" prefix on class cards</div>
-          </div>
-          <div class="settings-row-right"><div class="toggle" id="toggle-period" onclick="toggleSetting('showPeriod')"></div></div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-header"><h3>Grades</h3></div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Low score threshold</div>
-            <div class="settings-row-desc">Assignments below this % are flagged red</div>
-          </div>
-          <div class="settings-row-right">
-            <select class="settings-select" id="setting-lowThreshold" onchange="saveSetting('lowThreshold', this.value)">
-              <option value="60">60%</option><option value="70">70%</option><option value="75">75%</option><option value="80">80%</option>
-            </select>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Default assignment sort</div>
-            <div class="settings-row-desc">How assignments are ordered in class detail view</div>
-          </div>
-          <div class="settings-row-right">
-            <select class="settings-select" id="setting-assignSort" onchange="saveSetting('assignSort', this.value)">
-              <option value="newest">Newest first</option><option value="oldest">Oldest first</option>
-            </select>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Show calculated % on grade cards</div>
-            <div class="settings-row-desc">Display computed percentage alongside the letter grade</div>
-          </div>
-          <div class="settings-row-right"><div class="toggle" id="toggle-showPct" onclick="toggleSetting('showPct')"></div></div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Hide letter grade on grades screen</div>
-            <div class="settings-row-desc">Hides the letter grade from beeing shown on grades section</div>
-          </div>
-          <div class="settings-row-right"><div class="toggle" id="toggle-hideGrades" onclick="toggleSetting('hideGrades')"></div></div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-header"><h3>Tasks</h3></div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Auto-priority threshold</div>
-            <div class="settings-row-desc">Score % below which "+ task" defaults to medium priority</div>
-          </div>
-          <div class="settings-row-right">
-            <select class="settings-select" id="setting-autoPriority" onchange="saveSetting('autoPriority', this.value)">
-              <option value="60">60%</option><option value="70">70%</option><option value="80">80%</option>
-            </select>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Hide completed tasks after</div>
-            <div class="settings-row-desc">Auto-collapse the completed section after</div>
-          </div>
-          <div class="settings-row-right">
-            <select class="settings-select" id="setting-hideCompleted" onchange="saveSetting('hideCompleted', this.value)">
-              <option value="never">Never</option><option value="1">1 day</option><option value="7">7 days</option><option value="30">30 days</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-header"><h3>Notifications</h3><span>Browser alerts for task and calendar reminders</span></div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Enable notifications</div>
-            <div class="settings-row-desc">Get alerts for upcoming and due tasks/calendar events</div>
-          </div>
-          <div class="settings-row-right"><div class="toggle" id="toggle-notifications" onclick="toggleNotificationsSetting()"></div></div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Reminder timing</div>
-            <div class="settings-row-desc">Choose how many days before due date/event date to alert</div>
-          </div>
-          <div class="settings-row-right">
-            <select class="settings-select" id="setting-notificationLeadDays" onchange="saveSetting('notificationLeadDays', this.value)">
-              <option value="0">On due date</option>
-              <option value="1">1 day before</option>
-              <option value="2">2 days before</option>
-              <option value="3">3 days before</option>
-              <option value="7">1 week before</option>
-            </select>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Browser permission</div>
-            <div class="settings-row-desc" id="notifications-permission-state">Checking browser support…</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-header"><h3>Data</h3><span>Stored in your browser's localStorage</span></div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Storage usage</div>
-            <div class="settings-row-desc" id="storage-usage">Calculating…</div>
-          </div>
-          <div class="settings-row-right">
-            <button class="btn btn-sm" onclick="exportData()">⬇ Export JSON</button>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Import backup</div>
-            <div class="settings-row-desc">Restore from a previously exported JSON file</div>
-          </div>
-          <div class="settings-row-right">
-            <label class="btn btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section danger-zone">
-        <div class="settings-section-header"><h3>⚠ Danger zone</h3></div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Clear all tasks</div>
-            <div class="settings-row-desc">Permanently delete all tasks — cannot be undone</div>
-          </div>
-          <div class="settings-row-right">
-            <button class="btn btn-sm btn-ghost" style="color:var(--red);border-color:rgba(248,113,113,0.3);" onclick="clearAllTasks()">Clear tasks</button>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Clear all data</div>
-            <div class="settings-row-desc">Delete all imported classes, assignments, and tasks</div>
-          </div>
-          <div class="settings-row-right">
-            <button class="btn btn-sm btn-ghost" style="color:var(--red);border-color:rgba(248,113,113,0.3);" onclick="clearAllData()">Clear everything</button>
-          </div>
-        </div>
-      </div>
-     <div class="settings-section">
-      <div class="settings-section-header">
-        <h3>About</h3>
-      </div>
-    
-      <!-- Row 1 -->
-      <div class="about-row">
-        <div class="settings-row-label">Version:</div>
-        <div class="about-row-desc" id="about-version"></div>
-      </div>
-    
-      <!-- Row 2 -->
-      <div class="about-row">
-        <div class="settings-row-label">Created By:</div>
-        <div class="about-row-desc">Emerson Wicke</div>
-      </div>
-    
-      <!-- Row 3 -->
-      <div class="about-row">
-        <div class="settings-row-label">Release Date:</div>
-        <div class="about-row-desc" id="about-release-date"></div>
-      </div>
-    </div>
-     
-  </main>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<div id="calendar-modal" class="modal-backdrop" onclick="closeCalendarModalOnBackdrop(event)" aria-hidden="true">
-  <div class="modal-content calendar-modal-content" role="dialog" aria-modal="true" aria-labelledby="calendar-modal-title">
-    <button type="button" class="modal-close calendar-modal-close" onclick="closeCalendarModal()" aria-label="Close dialog">&times;</button>
-    <h3 id="calendar-modal-title">New Event</h3>
-    <p id="calendar-selected-date" class="calendar-selected-date"></p>
-    <div class="form-grid">
-      <div class="form-group form-span">
-        <label for="calendar-event-title">Event title</label>
-        <input type="text" id="calendar-event-title" placeholder="e.g. Quiz review">
-      </div>
-      <div class="form-group form-span">
-        <label for="calendar-event-details">Details (optional)</label>
-        <textarea id="calendar-event-details" placeholder="Optional notes"></textarea>
-      </div>
-    </div>
-    <div class="form-actions" style="margin-top:12px;">
-      <button class="btn btn-primary" onclick="saveCalendarEvent()">Save Event</button>
-      <button class="btn" onclick="closeCalendarModal()">Cancel</button>
-      <button class="btn btn-ghost" id="delete-event" style="color:var(--red);border-color:rgba(248,113,113,0.3);display: none;" onclick="deleteCalendarEvent()">Delete</button>
-    </div>
-  </div>
-</div>
-<div id="game-popup" class="modal-backdrop" onlclick="closeGamePopup()" aria-hidden="true">
-  <div class="modal-content " role="dialog" aria-modal="true">
-    <h3 id="game-modal-title">Play</h3>
-    <br>
-       <div class="minesweeper-container">
-    <div class="minesweeper-header">
-        <div id="mine-count" class="minesweeper-status">010</div>
-        <button id="reset-btn" class="minesweeper-btn">🙂</button>
-        <div id="timer" class="minesweeper-status">000</div>
-    </div>
-    <div id="grid" class="minesweeper-grid"></div>
-</div>
-
-    <br>
-    <button class="btn" onclick="closeGamePopup()">Close</button>
-  </div>
-</div>
-
-<script>
-const APP_VERSION = '0.7.8';
-const APP_RELEASE_DATE = '2026-09-22';
-const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
-const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
-
-document.getElementById('about-version').textContent = APP_VERSION;
-document.getElementById('about-release-date').textContent = APP_RELEASE_DATE;
-const storageReadErrors = {};
-function readStoredJSON(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    const parsed = JSON.parse(raw);
-    return parsed == null ? fallback : parsed;
-  } catch (err) {
-    storageReadErrors[key] = true;
-    console.warn(`Failed to parse ${key}; using fallback`, err);
-    return fallback;
-  }
-}
-
-let classes = readStoredJSON('mst_classes', []);
-let tasks   = readStoredJSON('mst_tasks', []);
-let calendarEvents = readStoredJSON('mst_calendar_events', {});
-let notifiedReminders = readStoredJSON('mst_notified_reminders', {});
-let calendarViewDate = new Date();
-calendarViewDate.setDate(1);
-let selectedCalendarDate = null;
-let calendarLastFocusedElement = null;
-let updateState = {
-  updateAvailable: false,
-  latestVersion: null,
-  releasedAt: null,
-  retryCount: 0,
-  retryTimer: null,
-  checking: false,
-  applying: false
-};
-
-function save() {
-  localStorage.setItem('mst_classes', JSON.stringify(classes));
-  localStorage.setItem('mst_tasks',   JSON.stringify(tasks));
-  localStorage.setItem('mst_calendar_events', JSON.stringify(calendarEvents));
-}
-
-function saveNotifiedReminders() {
-  localStorage.setItem('mst_notified_reminders', JSON.stringify(notifiedReminders));
-}
-
-function toast(msg, ok = true) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + (ok ? 'ok' : 'err');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3500);
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-// ── Navigation ──────────────────────────────────────────────
-function nav(id) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  
-  if (event && event.currentTarget) {
-    event.currentTarget.classList.add('active');
-  }
-
-  // Safe check using optional chaining (?.)
-  document.getElementById('panel-' + id)?.classList.add('active');
-
-  if (id === 'grades') renderGrades();
-  if (id === 'tasks') renderTasks();
-  if (id === 'calendar') renderCalendar();
-  if (id === 'assignments') renderAssignments();
-  if (id === 'import') renderImportedList();
-  if (id === 'games') renderGames();
-  if (id === 'settings') renderSettings();
-}
-
-
-// ── Parser ──────────────────────────────────────────────────
-function parseMiStar(text) {
-  // Split text into per-class chunks at every "Per: N" header
-  const chunks = text.split(/(?=Per:\s*\d+\s+)/);
-  const results = [];
-
-  for (const chunk of chunks) {
-    if (!chunk.trim()) continue;
-
-    const headerMatch = chunk.match(/Per:\s*(\d+)\s+(.+?)\(([A-Z0-9]+)\)/);
-    if (!headerMatch) continue;
-
-    const period = headerMatch[1];
-    const name   = headerMatch[2].trim();
-    const code   = headerMatch[3].trim();
-
-    const gradeMatch   = chunk.match(/Current\s+(?:Quarter\s+\d+\s+)?Grade:\s*([A-F][+-]?)(?:\s*\(([\d.]+)%\))?/i);
-    const teacherMatch = chunk.match(/Teacher:\s*([^\n\t]+)/);
-
-    const grade   = gradeMatch  ? gradeMatch[1]  : '';
-    const gradePct= gradeMatch  ? gradeMatch[2]  : '';
-    const teacher = teacherMatch ? teacherMatch[1].trim() : '';
-
-    const lines = chunk.split('\n').map(l => l.trim());
-
-    // Find where assignments start (after the column header row)
-    let assignIdx = -1;
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes('Assignment') && lines[i].includes('Date Due')) {
-        assignIdx = i + 1;
-        break;
+      function readStoredJSON(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return fallback;
+          const parsed = JSON.parse(raw);
+          return parsed == null ? fallback : parsed;
+        } catch (err) {
+          storageReadErrors[key] = true;
+          console.warn(`Failed to parse ${key}; using fallback`, err);
+          return fallback;
+        }
       }
-    }
-    // Skip multi-line header continuations (Pts\nPossible, etc.)
-    if (assignIdx >= 0) {
-      while (assignIdx < lines.length) {
-        const l = lines[assignIdx];
-        if (/\d{2}\/\d{2}\/\d{4}/.test(l)) break;
-        assignIdx++;
+      let classes = readStoredJSON('mst_classes', []);
+      let tasks = readStoredJSON('mst_tasks', []);
+      let calendarEvents = readStoredJSON('mst_calendar_events', {});
+      let notifiedReminders = readStoredJSON('mst_notified_reminders', {});
+      let calendarViewDate = new Date();
+      calendarViewDate.setDate(1);
+      let selectedCalendarDate = null;
+      let calendarLastFocusedElement = null;
+      let updateState = {
+        updateAvailable: false,
+        latestVersion: null,
+        releasedAt: null,
+        retryCount: 0,
+        retryTimer: null,
+        checking: false,
+        applying: false
+      };
+
+      function save() {
+        localStorage.setItem('mst_classes', JSON.stringify(classes));
+        localStorage.setItem('mst_tasks', JSON.stringify(tasks));
+        localStorage.setItem('mst_calendar_events', JSON.stringify(calendarEvents));
       }
-    }
 
-    const assignments = [];
-    if (assignIdx >= 0) {
-      for (let i = assignIdx; i < lines.length; i++) {
-        const line = lines[i];
-        if (!/\d{2}\/\d{2}\/\d{4}/.test(line)) continue;
+      function saveNotifiedReminders() {
+        localStorage.setItem('mst_notified_reminders', JSON.stringify(notifiedReminders));
+      }
 
-        const parts = line.split(/\t+/).map(p => p.trim()).filter(p => p !== '');
-        
-        // Find the two dates (Date Due, Assigned) then everything after is assignment data
-        let dateCount = 0;
-        let afterDatesIdx = 0;
-        for (let j = 0; j < parts.length; j++) {
-          if (/^\d{2}\/\d{2}\/\d{4}$/.test(parts[j])) {
-            dateCount++;
-            if (dateCount === 2) { afterDatesIdx = j + 1; break; }
+      function toast(msg, ok = true) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show ' + (ok ? 'ok' : 'err');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 3500);
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+      // ── Navigation ──────────────────────────────────────────────
+      function nav(id) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        if (event && event.currentTarget) {
+          event.currentTarget.classList.add('active');
+        }
+        // Safe check using optional chaining (?.)
+        document.getElementById('panel-' + id)?.classList.add('active');
+        if (id === 'grades') renderGrades();
+        if (id === 'tasks') renderTasks();
+        if (id === 'calendar') renderCalendar();
+        if (id === 'assignments') renderAssignments();
+        if (id === 'import') renderImportedList();
+        if (id === 'games') renderGames();
+        if (id === 'settings') renderSettings();
+      }
+      // ── Parser ──────────────────────────────────────────────────
+      function parseMiStar(text) {
+        // Split text into per-class chunks at every "Per: N" header
+        const chunks = text.split(/(?=Per:\s*\d+\s+)/);
+        const results = [];
+        for (const chunk of chunks) {
+          if (!chunk.trim()) continue;
+          const headerMatch = chunk.match(/Per:\s*(\d+)\s+(.+?)\(([A-Z0-9]+)\)/);
+          if (!headerMatch) continue;
+          const period = headerMatch[1];
+          const name = headerMatch[2].trim();
+          const code = headerMatch[3].trim();
+          const gradeMatch = chunk.match(/Current\s+(?:Quarter\s+\d+\s+)?Grade:\s*([A-F][+-]?)(?:\s*\(([\d.]+)%\))?/i);
+          const teacherMatch = chunk.match(/Teacher:\s*([^\n\t]+)/);
+          const grade = gradeMatch ? gradeMatch[1] : '';
+          const gradePct = gradeMatch ? gradeMatch[2] : '';
+          const teacher = teacherMatch ? teacherMatch[1].trim() : '';
+          const lines = chunk.split('\n').map(l => l.trim());
+          // Find where assignments start (after the column header row)
+          let assignIdx = -1;
+          for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes('Assignment') && lines[i].includes('Date Due')) {
+              assignIdx = i + 1;
+              break;
+            }
           }
+          // Skip multi-line header continuations (Pts\nPossible, etc.)
+          if (assignIdx >= 0) {
+            while (assignIdx < lines.length) {
+              const l = lines[assignIdx];
+              if (/\d{2}\/\d{2}\/\d{4}/.test(l)) break;
+              assignIdx++;
+            }
+          }
+          const assignments = [];
+          if (assignIdx >= 0) {
+            for (let i = assignIdx; i < lines.length; i++) {
+              const line = lines[i];
+              if (!/\d{2}\/\d{2}\/\d{4}/.test(line)) continue;
+              const parts = line.split(/\t+/).map(p => p.trim()).filter(p => p !== '');
+              // Find the two dates (Date Due, Assigned) then everything after is assignment data
+              let dateCount = 0;
+              let afterDatesIdx = 0;
+              for (let j = 0; j < parts.length; j++) {
+                if (/^\d{2}\/\d{2}\/\d{4}$/.test(parts[j])) {
+                  dateCount++;
+                  if (dateCount === 2) {
+                    afterDatesIdx = j + 1;
+                    break;
+                  }
+                }
+              }
+              if (dateCount < 2) afterDatesIdx = 1;
+              const dateMatch = line.match(/\d{2}\/\d{2}\/\d{4}/);
+              const due = dateMatch ? dateMatch[0] : '';
+              const rest = parts.slice(afterDatesIdx);
+              if (!rest.length) continue;
+              const assignName = rest[0];
+              let possible = '',
+                score = '',
+                scoredAs = '',
+                notGraded = false,
+                comment = '';
+              let idx = 1;
+              if (idx < rest.length && /^\d+(\.\d+)?$/.test(rest[idx])) {
+                possible = rest[idx];
+                idx++;
+              }
+              if (idx < rest.length) {
+                const v = rest[idx];
+                if (/^\d+(\.\d+)?$/.test(v)) {
+                  score = v;
+                  idx++;
+                } else if (v === 'checked') {
+                  notGraded = true;
+                  idx++;
+                } else {
+                  scoredAs = v;
+                  idx++;
+                }
+              }
+              while (idx < rest.length) {
+                const v = rest[idx];
+                if (v === 'checked') {
+                  notGraded = true;
+                } else if (v && v.length > 1 && !/^\d+(\.\d+)?$/.test(v) && !scoredAs) {
+                  scoredAs = v;
+                } else if (v && v.length > 1 && !/^\d+(\.\d+)?$/.test(v) && scoredAs && !comment) {
+                  comment = v;
+                }
+                idx++;
+              }
+              if (assignName) assignments.push({
+                due,
+                name: assignName,
+                possible,
+                score,
+                scoredAs,
+                notGraded,
+                comment
+              });
+            }
+          }
+          results.push({
+            period,
+            name,
+            code,
+            grade,
+            gradePct,
+            teacher,
+            assignments,
+            importedAt: new Date().toISOString()
+          });
         }
-        if (dateCount < 2) afterDatesIdx = 1;
-
-        const dateMatch = line.match(/\d{2}\/\d{2}\/\d{4}/);
-        const due = dateMatch ? dateMatch[0] : '';
-        const rest = parts.slice(afterDatesIdx);
-        if (!rest.length) continue;
-
-        const assignName = rest[0];
-        let possible = '', score = '', scoredAs = '', notGraded = false, comment = '';
-        let idx = 1;
-
-        if (idx < rest.length && /^\d+(\.\d+)?$/.test(rest[idx])) { possible = rest[idx]; idx++; }
-
-        if (idx < rest.length) {
-          const v = rest[idx];
-          if (/^\d+(\.\d+)?$/.test(v)) { score = v; idx++; }
-          else if (v === 'checked') { notGraded = true; idx++; }
-          else { scoredAs = v; idx++; }
-        }
-
-        while (idx < rest.length) {
-          const v = rest[idx];
-          if (v === 'checked') { notGraded = true; }
-          else if (v && v.length > 1 && !/^\d+(\.\d+)?$/.test(v) && !scoredAs) { scoredAs = v; }
-          else if (v && v.length > 1 && !/^\d+(\.\d+)?$/.test(v) && scoredAs && !comment) { comment = v; }
-          idx++;
-        }
-
-        if (assignName) assignments.push({ due, name: assignName, possible, score, scoredAs, notGraded, comment });
+        return results;
       }
-    }
 
-    results.push({ period, name, code, grade, gradePct, teacher, assignments, importedAt: new Date().toISOString() });
-  }
+      function parseAndImport() {
+        const raw = document.getElementById('paste-input').value.trim();
+        if (!raw) {
+          toast('Paste something first!', false);
+          return;
+        }
+        const parsed = parseMiStar(raw);
+        if (!parsed.length) {
+          toast('Could not find any classes — check the pasted text.', false);
+          return;
+        }
+        let added = 0,
+          updated = 0;
+        parsed.forEach(p => {
+          const i = classes.findIndex(c => c.code === p.code);
+          if (i >= 0) {
+            classes[i] = p;
+            updated++;
+          } else {
+            classes.push(p);
+            added++;
+          }
+        });
+        save();
+        rebuildClassSelects();
+        document.getElementById('paste-input').value = '';
+        renderImportedList();
+        toast(`Imported ${added + updated} class${added + updated !== 1 ? 'es' : ''} (${added} new, ${updated} updated)`);
+      }
 
-  return results;
-}
+      function rebuildClassSelects() {
+        ['a-class', 't-class'].forEach((id, i) => {
+          const sel = document.getElementById(id);
+          sel.innerHTML = i === 0 ? '<option value="all">All classes</option>' : '<option value="">— Any —</option>';
+          classes.forEach(c => {
+            const o = document.createElement('option');
+            o.value = c.code;
+            o.textContent = `Per ${c.period}: ${c.name}`;
+            sel.appendChild(o);
+          });
+        });
+      }
+      // ── Grades ──────────────────────────────────────────────────
+      function gradeClass(g) {
+        if (!g) return '';
+        const u = g.toUpperCase();
+        if (u.startsWith('A')) return 'ga';
+        if (u.startsWith('B')) return 'gb';
+        if (u.startsWith('C')) return 'gc';
+        if (u.startsWith('D')) return 'gd';
+        return 'gf';
+      }
 
-function parseAndImport() {
-  const raw = document.getElementById('paste-input').value.trim();
-  if (!raw) { toast('Paste something first!', false); return; }
-
-  const parsed = parseMiStar(raw);
-  if (!parsed.length) { toast('Could not find any classes — check the pasted text.', false); return; }
-
-  let added = 0, updated = 0;
-  parsed.forEach(p => {
-    const i = classes.findIndex(c => c.code === p.code);
-    if (i >= 0) { classes[i] = p; updated++; }
-    else { classes.push(p); added++; }
-  });
-
-  save();
-  rebuildClassSelects();
-  document.getElementById('paste-input').value = '';
-  renderImportedList();
-  toast(`Imported ${added + updated} class${added + updated !== 1 ? 'es' : ''} (${added} new, ${updated} updated)`);
-}
-
-function rebuildClassSelects() {
-  ['a-class', 't-class'].forEach((id, i) => {
-    const sel = document.getElementById(id);
-    sel.innerHTML = i === 0 ? '<option value="all">All classes</option>' : '<option value="">— Any —</option>';
-    classes.forEach(c => {
-      const o = document.createElement('option');
-      o.value = c.code; o.textContent = `Per ${c.period}: ${c.name}`;
-      sel.appendChild(o);
-    });
-  });
-}
-
-// ── Grades ──────────────────────────────────────────────────
-function gradeClass(g) {
-  if (!g) return '';
-  const u = g.toUpperCase();
-  if (u.startsWith('A')) return 'ga';
-  if (u.startsWith('B')) return 'gb';
-  if (u.startsWith('C')) return 'gc';
-  if (u.startsWith('D')) return 'gd';
-  return 'gf';
-}
-
-function computePct(c) {
-  const scored = c.assignments.filter(a => a.score && a.possible);
-  if (!scored.length) return null;
-  return (scored.reduce((s, a) => s + parseFloat(a.score), 0) /
+      function computePct(c) {
+        const scored = c.assignments.filter(a => a.score && a.possible);
+        if (!scored.length) return null;
+        return (scored.reduce((s, a) => s + parseFloat(a.score), 0) /
           scored.reduce((s, a) => s + parseFloat(a.possible), 0) * 100).toFixed(1);
-}
+      }
 
-function renderGrades() {
-  document.title = "GradeBook | Grades";
-  document.getElementById("panel-assignments").style.display = 'none'
-  document.getElementById("panel-games").style.display = 'none'
-  const grid  = document.getElementById('classes-grid');
-  const empty = document.getElementById('grades-empty');
-  const mets  = document.getElementById('metrics');
-
-  if (!classes.length) { grid.innerHTML = ''; mets.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-
-  let tA = 0, tS = 0, tP = 0, tNG = 0;
-  classes.forEach(c => {
-    c.assignments.forEach(a => {
-      tA++;
-      if (a.notGraded) tNG++;
-      if (a.score && a.possible) { tS += parseFloat(a.score); tP += parseFloat(a.possible); }
-    });
-  });
-
-  mets.innerHTML = `
+      function renderGrades() {
+        document.title = "GradeBook | Grades";
+        document.getElementById("panel-assignments").style.display = 'none'
+        document.getElementById("panel-games").style.display = 'none'
+        const grid = document.getElementById('classes-grid');
+        const empty = document.getElementById('grades-empty');
+        const mets = document.getElementById('metrics');
+        if (!classes.length) {
+          grid.innerHTML = '';
+          mets.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+        empty.style.display = 'none';
+        let tA = 0,
+          tS = 0,
+          tP = 0,
+          tNG = 0;
+        classes.forEach(c => {
+          c.assignments.forEach(a => {
+            tA++;
+            if (a.notGraded) tNG++;
+            if (a.score && a.possible) {
+              tS += parseFloat(a.score);
+              tP += parseFloat(a.possible);
+            }
+          });
+        });
+        mets.innerHTML = `
     <div class="metric"><div class="metric-label">Classes</div><div class="metric-val">${classes.length}</div></div>
     <div class="metric"><div class="metric-label">Overall</div><div class="metric-val">${tP > 0 ? (tS/tP*100).toFixed(1)+'%' : '—'}</div></div>
     <div class="metric"><div class="metric-label">Assignments</div><div class="metric-val">${tA}</div></div>
     <div class="metric"><div class="metric-label">Pending</div><div class="metric-val ${tNG > 0 ? 'warn' : ''}">${tNG}</div></div>`;
-
-  grid.innerHTML = classes.map((c, i) => {
-    const pct = computePct(c);
-    const ng = c.assignments.filter(a => a.notGraded).length;
-    const barW = pct ? Math.min(parseFloat(c.gradePct), 100) : 0;
-    return `<div class="class-card" onclick="showDetail(${i})">
+        grid.innerHTML = classes.map((c, i) => {
+          const pct = computePct(c);
+          const ng = c.assignments.filter(a => a.notGraded).length;
+          const barW = pct ? Math.min(parseFloat(c.gradePct), 100) : 0;
+          return `<div class="class-card" onclick="showDetail(${i})">
       <div class="class-card-top">
         <div>
           <div class="class-card-name">Per ${c.period} · ${c.name}</div>
@@ -1136,23 +2128,21 @@ function renderGrades() {
         ${ng > 0 ? `<div class="cs" style="color:var(--yellow)">Pending: <span style="color:var(--yellow)">${ng}</span></div>` : ''}
       </div>
     </div>`;
-  }).join('');
-}
+        }).join('');
+      }
 
-function showDetail(idx) {
-  const c = classes[idx];
-  document.getElementById('grades-overview').style.display = 'none';
-  document.getElementById('grades-detail').style.display = 'block';
-  document.getElementById("panel-assignments").style.display = 'none'
-  document.getElementById('detail-title').textContent = c.name;
-  document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
-  
-  const chip = document.getElementById('detail-grade-chip');
-  chip.textContent = settings.hideGrades ? '' : (c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—');
-  chip.className = settings.hideGrades ? '' : `grade-chip ${gradeClass(c.grade)}`;
-
-  document.getElementById('detail-tbody').innerHTML = c.assignments.map(a =>
-    `<tr>
+      function showDetail(idx) {
+        const c = classes[idx];
+        document.getElementById('grades-overview').style.display = 'none';
+        document.getElementById('grades-detail').style.display = 'block';
+        document.getElementById("panel-assignments").style.display = 'none'
+        document.getElementById('detail-title').textContent = c.name;
+        document.getElementById('detail-sub').textContent = `Period ${c.period} · ${c.teacher}`;
+        const chip = document.getElementById('detail-grade-chip');
+        chip.textContent = settings.hideGrades ? '' : (c.gradePct ? `${c.grade} · ${c.gradePct}%` : c.grade || '—');
+        chip.className = settings.hideGrades ? '' : `grade-chip ${gradeClass(c.grade)}`;
+        document.getElementById('detail-tbody').innerHTML = c.assignments.map(a =>
+          `<tr>
       <td title="${a.name}">${a.name}</td>
       <td style="font-family:var(--mono);font-size:12px">${a.due}</td>
       <td>${scoreDisplay(a)}</td>
@@ -1160,69 +2150,69 @@ function showDetail(idx) {
       <td>${notesDisplay(a)}</td>
       <td><button class="btn btn-todo" onclick="addToTasks(${idx},'${encodeURIComponent(a.name)}','${new Date().toISOString().split('T')[0]}')">+ Task</button><button class="btn btn-ghost btn-sm" onclick="deleteAssignment(${a.ci},'${encodeURIComponent(a.name)}')" title="Remove">✕</button></td>
     </tr>`
-    
-  ).join('');
-  nav('grades')
-  document.title = `GradeBook | ${c.teacher}`;
-}
+        ).join('');
+        nav('grades')
+        document.title = `GradeBook | ${c.teacher}`;
+      }
 
-function closeDetail() {
-  document.title = "GradeBook | Grades";
-  document.getElementById('grades-overview').style.display = 'block';
-  document.getElementById("panel-assignments").style.display = 'none'
-  document.getElementById('grades-detail').style.display = 'none';
-}
+      function closeDetail() {
+        document.title = "GradeBook | Grades";
+        document.getElementById('grades-overview').style.display = 'block';
+        document.getElementById("panel-assignments").style.display = 'none'
+        document.getElementById('grades-detail').style.display = 'none';
+      }
 
-function scoreDisplay(a) {
-  if (a.notGraded) return `<span class="pill pill-gray">Pending</span>`;
-  if (a.scoredAs && /excus/i.test(a.scoredAs)) return `<span class="pill pill-blue">Excused</span>`;
-  if (a.score) {
-    const p = a.possible ? parseFloat(a.score) / parseFloat(a.possible) * 100 : null;
-    const cls = p === null ? 'pill-gray' : p >= 90 ? 'pill-green' : p >= 70 ? 'pill-yellow' : 'pill-red';
-    return `<span class="pill ${cls}">${a.score}</span>`;
-  }
-  if (a.scoredAs) return `<span class="pill pill-gray">${a.scoredAs}</span>`;
-  return `<span class="pill pill-gray">—</span>`;
-}
+      function scoreDisplay(a) {
+        if (a.notGraded) return `<span class="pill pill-gray">Pending</span>`;
+        if (a.scoredAs && /excus/i.test(a.scoredAs)) return `<span class="pill pill-blue">Excused</span>`;
+        if (a.score) {
+          const p = a.possible ? parseFloat(a.score) / parseFloat(a.possible) * 100 : null;
+          const cls = p === null ? 'pill-gray' : p >= 90 ? 'pill-green' : p >= 70 ? 'pill-yellow' : 'pill-red';
+          return `<span class="pill ${cls}">${a.score}</span>`;
+        }
+        if (a.scoredAs) return `<span class="pill pill-gray">${a.scoredAs}</span>`;
+        return `<span class="pill pill-gray">—</span>`;
+      }
 
-function notesDisplay(a) {
-  const parts = [
-    a.scoredAs && !/excus/i.test(a.scoredAs) ? a.scoredAs : '',
-    a.comment
-  ].filter(Boolean).join(' · ');
-  return parts ? `<span style="font-size:12px;color:var(--text3)" title="${parts}">${parts.slice(0,40)}${parts.length>40?'…':''}</span>` : '';
-}
-
-// ── Assignments ──────────────────────────────────────────────
-function renderAssignments() {
-  document.title = "GradeBook | Assigmeents";
-  document.getElementById("panel-assignments").style.display = 'block'
-  document.getElementById("panel-games").style.display = 'none'
-
-  const search  = document.getElementById('a-search').value.toLowerCase();
-  const cls     = document.getElementById('a-class').value;
-  const status  = document.getElementById('a-status').value;
-  const tbody   = document.getElementById('assign-tbody');
-  const empty   = document.getElementById('assign-empty');
-  const sub     = document.getElementById('assign-sub');
-
-  let all = [];
-  classes.forEach((c, ci) => c.assignments.forEach(a => all.push({ ...a, cls: c, ci })));
-
-  if (cls !== 'all') all = all.filter(a => a.cls.code === cls);
-  if (status === 'pending')  all = all.filter(a => a.notGraded);
-  if (status === 'scored')   all = all.filter(a => a.score && !a.notGraded);
-  if (status === 'excused')  all = all.filter(a => a.scoredAs && /excus/i.test(a.scoredAs));
-  if (status === 'low')      all = all.filter(a => a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7);
-  if (search) all = all.filter(a => a.name.toLowerCase().includes(search) || a.cls.name.toLowerCase().includes(search));
-
-      all.sort((a, b) => new Date(b.due) - new Date(a.due));
-      sub.textContent = `${all.length} assignment${all.length !== 1 ? 's' : ''}`;
-
-      if (!all.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-      empty.style.display = 'none';
-
-      tbody.innerHTML = all.map(a => `
+      function notesDisplay(a) {
+        const parts = [
+          a.scoredAs && !/excus/i.test(a.scoredAs) ? a.scoredAs : '',
+          a.comment
+        ].filter(Boolean).join(' · ');
+        return parts ? `<span style="font-size:12px;color:var(--text3)" title="${parts}">${parts.slice(0,40)}${parts.length>40?'…':''}</span>` : '';
+      }
+      // ── Assignments ──────────────────────────────────────────────
+      function renderAssignments() {
+        document.title = "GradeBook | Assigmeents";
+        document.getElementById("panel-assignments").style.display = 'block'
+        document.getElementById("panel-games").style.display = 'none'
+        const search = document.getElementById('a-search').value.toLowerCase();
+        const cls = document.getElementById('a-class').value;
+        const status = document.getElementById('a-status').value;
+        const tbody = document.getElementById('assign-tbody');
+        const empty = document.getElementById('assign-empty');
+        const sub = document.getElementById('assign-sub');
+        let all = [];
+        classes.forEach((c, ci) => c.assignments.forEach(a => all.push({
+          ...a,
+          cls: c,
+          ci
+        })));
+        if (cls !== 'all') all = all.filter(a => a.cls.code === cls);
+        if (status === 'pending') all = all.filter(a => a.notGraded);
+        if (status === 'scored') all = all.filter(a => a.score && !a.notGraded);
+        if (status === 'excused') all = all.filter(a => a.scoredAs && /excus/i.test(a.scoredAs));
+        if (status === 'low') all = all.filter(a => a.score && a.possible && parseFloat(a.score) / parseFloat(a.possible) < 0.7);
+        if (search) all = all.filter(a => a.name.toLowerCase().includes(search) || a.cls.name.toLowerCase().includes(search));
+        all.sort((a, b) => new Date(b.due) - new Date(a.due));
+        sub.textContent = `${all.length} assignment${all.length !== 1 ? 's' : ''}`;
+        if (!all.length) {
+          tbody.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+        empty.style.display = 'none';
+        tbody.innerHTML = all.map(a => `
       <tr> 
         <td title="${a.name}">
           <a href="#" onclick="event.preventDefault(); showDetail(${a.ci})" style="color: inherit; text-decoration: underline;">
@@ -1235,158 +2225,166 @@ function renderAssignments() {
         <td>${notesDisplay(a)}</td> 
         <td>
       </tr>`).join('');
-    
-    
-    }
-
-    function deleteAssignment(ci, encodedName) {
-      const name = decodeURIComponent(encodedName);
-      classes[ci].assignments = classes[ci].assignments.filter(a => a.name !== name);
-      save();
-      renderAssignments();
-      toast('Assignment removed');
-    }
-
-    // Global tracking variable to know if we are creating or editing
-    let currentEditingTaskId = null;
-
-    // Modal UI Control Utilities
-    function openTaskModal() {
-      document.getElementById('task-modal').style.display = 'flex';
-    }
-
-    function closeTaskModal() {
-      document.getElementById('task-modal').style.display = 'none';
-      clearTaskForm(); // Clean up state when closing
-    }
-
-    function closeTaskModalOnBackdrop(event) {
-      if (event.target.id === 'task-modal') {
-        closeTaskModal();
       }
-    }
 
-    // ── Refactored Tasks Code ────────────────────────────────────────────────────
+      function deleteAssignment(ci, encodedName) {
+        const name = decodeURIComponent(encodedName);
+        classes[ci].assignments = classes[ci].assignments.filter(a => a.name !== name);
+        save();
+        renderAssignments();
+        toast('Assignment removed');
+      }
+      // Global tracking variable to know if we are creating or editing
+      let currentEditingTaskId = null;
+      // Modal UI Control Utilities
+      function openTaskModal() {
+        document.getElementById('task-modal').style.display = 'flex';
+      }
 
-    function addTask() {
-      const title = document.getElementById('t-title').value.trim();
-      if (!title) { toast('Enter a title', false); return; }
-    
-      if (currentEditingTaskId !== null) {
-        // ── Saving an existing task (Editing Mode) ──
-        const t = tasks.find(x => x.id === currentEditingTaskId);
-        if (t) {
-          t.title     = title;
-          t.classCode = document.getElementById('t-class').value;
-          t.priority  = document.getElementById('t-priority').value;
-          t.due       = document.getElementById('t-due').value;
-          t.notes     = document.getElementById('t-notes').value.trim();
-          toast('Task updated');
+      function closeTaskModal() {
+        document.getElementById('task-modal').style.display = 'none';
+        clearTaskForm(); // Clean up state when closing
+      }
+
+      function closeTaskModalOnBackdrop(event) {
+        if (event.target.id === 'task-modal') {
+          closeTaskModal();
         }
-      } else {
-        // ── Adding a brand new task (Creation Mode) ──
+      }
+      // ── Refactored Tasks Code ────────────────────────────────────────────────────
+      function addTask() {
+        const title = document.getElementById('t-title').value.trim();
+        if (!title) {
+          toast('Enter a title', false);
+          return;
+        }
+        if (currentEditingTaskId !== null) {
+          // ── Saving an existing task (Editing Mode) ──
+          const t = tasks.find(x => x.id === currentEditingTaskId);
+          if (t) {
+            t.title = title;
+            t.classCode = document.getElementById('t-class').value;
+            t.priority = document.getElementById('t-priority').value;
+            t.due = document.getElementById('t-due').value;
+            t.notes = document.getElementById('t-notes').value.trim();
+            toast('Task updated');
+          }
+        } else {
+          // ── Adding a brand new task (Creation Mode) ──
+          tasks.push({
+            id: Date.now(),
+            title,
+            classCode: document.getElementById('t-class').value,
+            priority: document.getElementById('t-priority').value,
+            due: document.getElementById('t-due').value,
+            notes: document.getElementById('t-notes').value.trim(),
+            completed: false
+          });
+          toast('Task added');
+        }
+        save();
+        closeTaskModal(); // Closes the modal AND clears the form automatically
+        renderTasks();
+      }
+
+      function clearTaskForm() {
+        // Clear modal inputs
+        ['t-title', 't-due', 't-notes'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('t-class').value = '';
+        document.getElementById('t-priority').value = 'medium';
+        // Reset heading and tracker to creation defaults
+        currentEditingTaskId = null;
+        const heading = document.querySelector('.task-builder h3');
+        if (heading) heading.textContent = '+ New Task';
+        const submitBtn = document.querySelector('.task-builder .btn-primary');
+        if (submitBtn) submitBtn.textContent = 'Add Task';
+      }
+
+      function editTask(id) {
+        const t = tasks.find(x => x.id === id);
+        if (!t) return;
+        // Track the ID we are currently modifying
+        currentEditingTaskId = id;
+        // Change the modal interface titles to look like an edit panel
+        const heading = document.querySelector('.task-builder h3');
+        if (heading) heading.textContent = 'Edit Task';
+        const submitBtn = document.querySelector('.task-builder .btn-primary');
+        if (submitBtn) submitBtn.textContent = 'Save Changes';
+        // Fill the modal form fields with existing data
+        document.getElementById('t-title').value = t.title;
+        document.getElementById('t-class').value = t.classCode;
+        document.getElementById('t-priority').value = t.priority;
+        document.getElementById('t-due').value = t.due || '';
+        document.getElementById('t-notes').value = t.notes || '';
+        // Pop open the modal
+        openTaskModal();
+      }
+      // Keeping your original baseline logic intact 
+      function addToTasks(classIdx, encodedName, due) {
+        const name = decodeURIComponent(encodedName);
+        const c = classes[classIdx];
+        const a = c.assignments.find(x => x.name === name);
+        let priority = 'low';
+        if (a) {
+          if (a.notGraded) priority = 'high';
+          else if (a.score && a.possible && parseFloat(a.score) / parseFloat(a.possible) < 0.7) priority = 'medium';
+        }
+        const exists = tasks.find(t => t.title === name && t.classCode === c.code);
+        if (exists) {
+          toast(`"${name}" is already in tasks`);
+          return;
+        }
         tasks.push({
           id: Date.now(),
-          title,
-          classCode: document.getElementById('t-class').value,
-          priority:  document.getElementById('t-priority').value,
-          due:       document.getElementById('t-due').value,
-          notes:     document.getElementById('t-notes').value.trim(),
+          title: name,
+          classCode: c.code,
+          priority,
+          due,
+          notes: '',
           completed: false
         });
-        toast('Task added');
+        save();
+        renderTasks(); // Ensure list renders if added contextually
+        toast(`Added "${name.slice(0,30)}…" to tasks`);
       }
-    
-      save();
-      closeTaskModal(); // Closes the modal AND clears the form automatically
-      renderTasks();
-    }
 
-    function clearTaskForm() {
-      // Clear modal inputs
-      ['t-title','t-due','t-notes'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('t-class').value = '';
-      document.getElementById('t-priority').value = 'medium';
-
-      // Reset heading and tracker to creation defaults
-      currentEditingTaskId = null;
-      const heading = document.querySelector('.task-builder h3');
-      if (heading) heading.textContent = '+ New Task';
-
-      const submitBtn = document.querySelector('.task-builder .btn-primary');
-      if (submitBtn) submitBtn.textContent = 'Add Task';
-    }
-
-    function editTask(id) {
-      const t = tasks.find(x => x.id === id);
-      if (!t) return;
-    
-      // Track the ID we are currently modifying
-      currentEditingTaskId = id;
-    
-      // Change the modal interface titles to look like an edit panel
-      const heading = document.querySelector('.task-builder h3');
-      if (heading) heading.textContent = 'Edit Task';
-
-      const submitBtn = document.querySelector('.task-builder .btn-primary');
-      if (submitBtn) submitBtn.textContent = 'Save Changes';
-    
-      // Fill the modal form fields with existing data
-      document.getElementById('t-title').value = t.title;
-      document.getElementById('t-class').value = t.classCode;
-      document.getElementById('t-priority').value = t.priority;
-      document.getElementById('t-due').value = t.due || '';
-      document.getElementById('t-notes').value = t.notes || '';
-    
-      // Pop open the modal
-      openTaskModal();
-    }
-
-    // Keeping your original baseline logic intact 
-    function addToTasks(classIdx, encodedName, due) {
-      const name = decodeURIComponent(encodedName);
-      const c = classes[classIdx];
-      const a = c.assignments.find(x => x.name === name);
-      let priority = 'low';
-      if (a) {
-        if (a.notGraded) priority = 'high';
-        else if (a.score && a.possible && parseFloat(a.score)/parseFloat(a.possible) < 0.7) priority = 'medium';
+      function toggleTask(id) {
+        const t = tasks.find(x => x.id === id);
+        if (t) {
+          t.completed = !t.completed;
+          save();
+          renderTasks();
+        }
       }
-      const exists = tasks.find(t => t.title === name && t.classCode === c.code);
-      if (exists) { toast(`"${name}" is already in tasks`); return; }
-      tasks.push({ id: Date.now(), title: name, classCode: c.code, priority, due, notes: '', completed: false });
-      save();
-      renderTasks(); // Ensure list renders if added contextually
-      toast(`Added "${name.slice(0,30)}…" to tasks`);
-    }
 
-    function toggleTask(id) {
-      const t = tasks.find(x => x.id === id);
-      if (t) { t.completed = !t.completed; save(); renderTasks(); }
-    }
+      function deleteTask(id) {
+        tasks = tasks.filter(x => x.id !== id);
+        save();
+        renderTasks();
+      }
 
-    function deleteTask(id) {
-      tasks = tasks.filter(x => x.id !== id);
-      save(); renderTasks();
-    }
-
-function renderTasks() {
-  document.getElementById("panel-assignments").style.display = 'none'
-  document.getElementById("panel-games").style.display = 'none'
-
-  document.title = "GradeBook | Tasks";
-  const list  = document.getElementById('tasks-list');
-  const empty = document.getElementById('tasks-empty');
-  if (!tasks.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-
-  const pOrder = { high: 0, medium: 1, low: 2 };
-  const active = tasks.filter(t => !t.completed).sort((a, b) => pOrder[a.priority] - pOrder[b.priority] || new Date(a.due||'9999-12-31') - new Date(b.due||'9999-12-31'));
-  const done   = tasks.filter(t =>  t.completed);
-
-  const renderTask = t => {
-    const c = classes.find(x => x.code === t.classCode);
-    return `<div class="task-item ${t.completed ? 'done' : ''}" id="task-row-${t.id}">
+      function renderTasks() {
+        document.getElementById("panel-assignments").style.display = 'none'
+        document.getElementById("panel-games").style.display = 'none'
+        document.title = "GradeBook | Tasks";
+        const list = document.getElementById('tasks-list');
+        const empty = document.getElementById('tasks-empty');
+        if (!tasks.length) {
+          list.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+        empty.style.display = 'none';
+        const pOrder = {
+          high: 0,
+          medium: 1,
+          low: 2
+        };
+        const active = tasks.filter(t => !t.completed).sort((a, b) => pOrder[a.priority] - pOrder[b.priority] || new Date(a.due || '9999-12-31') - new Date(b.due || '9999-12-31'));
+        const done = tasks.filter(t => t.completed);
+        const renderTask = t => {
+          const c = classes.find(x => x.code === t.classCode);
+          return `<div class="task-item ${t.completed ? 'done' : ''}" id="task-row-${t.id}">
       <div class="task-cb ${t.completed ? 'checked' : ''}" onclick="toggleTask(${t.id})"></div>
       <div class="task-body">
           <div class="task-title ${t.completed ? 'done' : ''}" onclick="editTask(${t.id})" style="cursor:pointer" title="Click to edit">${t.title}</div>
@@ -1399,80 +2397,72 @@ function renderTasks() {
       </div>
       <button class="btn btn-ghost btn-sm" onclick="deleteTask(${t.id})" title="Delete">✕</button>
     </div>`;
-  };
+        };
+        list.innerHTML =
+          (active.length ? `<div class="tasks-section-label">Active · ${active.length}</div>` + active.map(renderTask).join('') : '') +
+          (done.length ? `<div class="tasks-section-label">Completed · ${done.length}</div>` + done.map(renderTask).join('') : '');
+      }
+      // ── Calendar ──────────────────────────────────────────────────
+      function calendarDateKey(year, month, day) {
+        const y = String(year);
+        const m = String(month + 1).padStart(2, '0');
+        const d = String(day).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
 
-  list.innerHTML =
-    (active.length ? `<div class="tasks-section-label">Active · ${active.length}</div>` + active.map(renderTask).join('') : '') +
-    (done.length   ? `<div class="tasks-section-label">Completed · ${done.length}</div>` + done.map(renderTask).join('') : '');
-}
+      function formatCalendarDateDisplay(key) {
+        const [y, m, d] = key.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
 
-// ── Calendar ──────────────────────────────────────────────────
-function calendarDateKey(year, month, day) {
-  const y = String(year);
-  const m = String(month + 1).padStart(2, '0');
-  const d = String(day).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
+      function ensureCalendarWeekdays() {
+        const weekdayEl = document.getElementById('calendar-weekdays');
+        if (!weekdayEl || weekdayEl.childElementCount) return;
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        weekdayEl.innerHTML = days.map(day => `<div class="calendar-weekday">${day}</div>`).join('');
+      }
 
-function formatCalendarDateDisplay(key) {
-  const [y, m, d] = key.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
-
-function ensureCalendarWeekdays() {
-  const weekdayEl = document.getElementById('calendar-weekdays');
-  if (!weekdayEl || weekdayEl.childElementCount) return;
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  weekdayEl.innerHTML = days.map(day => `<div class="calendar-weekday">${day}</div>`).join('');
-}
-
-function renderCalendar() {
-  document.title = "GradeBook | Calendar";
-  document.getElementById("panel-assignments").style.display = 'none';
-  document.getElementById("panel-games").style.display = 'none'
-
-  ensureCalendarWeekdays();
-  const monthLabel = document.getElementById('calendar-month-label');
-  const grid = document.getElementById('calendar-grid');
-  if (!monthLabel || !grid) return;
-
-  const year = calendarViewDate.getFullYear();
-  const month = calendarViewDate.getMonth();
-  monthLabel.textContent = calendarViewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-  const firstWeekday = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
-  const cells = [];
-
-  for (let i = 0; i < firstWeekday; i++) {
-    cells.push('<div class="calendar-day outside" aria-hidden="true"></div>');
-  }
-
-// Track whether we are editing an event, and which index it is at
-let editingEventIndex = null; 
-
-// Modified Loop Section (Update this part inside your renderCalendar loop)
-for (let day = 1; day <= daysInMonth; day++) {
-  const key = calendarDateKey(year, month, day);
-  const events = Array.isArray(calendarEvents[key]) ? calendarEvents[key] : [];
-  const isToday = isCurrentMonth && today.getDate() === day;
-
-  // Pass the item index (i) into the edit modal function
-  const preview = events.slice(0, 2).map((e, i) => {
-    const safeTitle = escapeHtml(e.title);
-    return `<div class="calendar-event-item" title="${safeTitle}" role="button" tabindex="0" onclick="event.stopPropagation(); openEventModal('${key}', ${i})">${safeTitle}</div>`;
-  }).join('');
-
-  const more = events.length > 2 ? `<div class="calendar-more">+${events.length - 2} more</div>` : '';
-
-  cells.push(`
+      function renderCalendar() {
+        document.title = "GradeBook | Calendar";
+        document.getElementById("panel-assignments").style.display = 'none';
+        document.getElementById("panel-games").style.display = 'none'
+        ensureCalendarWeekdays();
+        const monthLabel = document.getElementById('calendar-month-label');
+        const grid = document.getElementById('calendar-grid');
+        if (!monthLabel || !grid) return;
+        const year = calendarViewDate.getFullYear();
+        const month = calendarViewDate.getMonth();
+        monthLabel.textContent = calendarViewDate.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric'
+        });
+        const firstWeekday = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+        const cells = [];
+        for (let i = 0; i < firstWeekday; i++) {
+          cells.push('<div class="calendar-day outside" aria-hidden="true"></div>');
+        }
+        // Track whether we are editing an event, and which index it is at
+        let editingEventIndex = null;
+        // Modified Loop Section (Update this part inside your renderCalendar loop)
+        for (let day = 1; day <= daysInMonth; day++) {
+          const key = calendarDateKey(year, month, day);
+          const events = Array.isArray(calendarEvents[key]) ? calendarEvents[key] : [];
+          const isToday = isCurrentMonth && today.getDate() === day;
+          // Pass the item index (i) into the edit modal function
+          const preview = events.slice(0, 2).map((e, i) => {
+            const safeTitle = escapeHtml(e.title);
+            return `<div class="calendar-event-item" title="${safeTitle}" role="button" tabindex="0" onclick="event.stopPropagation(); openEventModal('${key}', ${i})">${safeTitle}</div>`;
+          }).join('');
+          const more = events.length > 2 ? `<div class="calendar-more">+${events.length - 2} more</div>` : '';
+          cells.push(`
     <div class="calendar-day ${isToday ? 'today' : ''}" 
          tabindex="0"
          onclick="openCalendarModal('${key}')"
@@ -1490,151 +2480,137 @@ for (let day = 1; day <= daysInMonth; day++) {
       <div class="calendar-events">${preview}${more}</div>
     </div>
   `);
-}
+        }
+        grid.innerHTML = cells.join('');
+      }
 
-  grid.innerHTML = cells.join('');
-}
+      function changeCalendarMonth(delta) {
+        calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + delta, 1);
+        renderCalendar();
+      }
 
-function changeCalendarMonth(delta) {
-  calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + delta, 1);
-  renderCalendar();
-}
+      function goToToday() {
+        calendarViewDate = new Date();
+        calendarViewDate.setDate(1);
+        renderCalendar();
+      }
+      // Opens the form to save a brand new event
+      function openCalendarModal(key) {
+        selectedCalendarDate = key;
+        editingEventIndex = null; // Clear out index because this is a NEW event
+        calendarLastFocusedElement = document.activeElement;
+        const modal = document.getElementById('calendar-modal');
+        const modalTitle = document.getElementById('calendar-modal-title');
+        const titleInput = document.getElementById('calendar-event-title');
+        const detailsInput = document.getElementById('calendar-event-details');
+        const deleteEvent = document.getElementById('delete-event');
+        if (!modal || !titleInput || !detailsInput) return;
+        modalTitle.textContent = 'New Task';
+        titleInput.value = '';
+        detailsInput.value = '';
+        deleteEvent.style.display = 'none';
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        titleInput.focus();
+      }
+      // Opens the form with existing data populated for editing
+      function openEventModal(key, index) {
+        selectedCalendarDate = key;
+        editingEventIndex = index; // Store the exact index of the event we are changing
+        calendarLastFocusedElement = document.activeElement;
+        const modal = document.getElementById('calendar-modal');
+        const modalTitle = document.getElementById('calendar-modal-title');
+        const titleInput = document.getElementById('calendar-event-title');
+        const detailsInput = document.getElementById('calendar-event-details');
+        const deleteEvent = document.getElementById('delete-event');
+        if (!modal || !titleInput || !detailsInput) return;
+        // Retrieve the target item details using the array index
+        const dayEvents = calendarEvents[key] || [];
+        const foundEvent = dayEvents[index];
+        if (!foundEvent) return;
+        modalTitle.textContent = 'Edit Task';
+        titleInput.value = foundEvent.title;
+        detailsInput.value = foundEvent.details || '';
+        deleteEvent.style.display = '';
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        titleInput.focus();
+      }
 
-function goToToday() {
-  calendarViewDate = new Date();
-  calendarViewDate.setDate(1);
-  renderCalendar();
-}
+      function deleteCalendarEvent() {
+        // Guard check to make sure a date and specific event index are active
+        if (!selectedCalendarDate || editingEventIndex === null) return;
+        const dayEvents = calendarEvents[selectedCalendarDate];
+        if (!Array.isArray(dayEvents)) return;
+        // Remove the specific item from the array using its index position
+        dayEvents.splice(editingEventIndex, 1);
+        // Clean up: If no events are left on this date, delete the key entirely
+        if (dayEvents.length === 0) {
+          delete calendarEvents[selectedCalendarDate];
+        }
+        save(); // Sync changes to your global storage utility
+        closeCalendarModal(); // Close the active window view
+        renderCalendar(); // Force a UI repaint to reflect changes on the grid
+        toast('Event deleted');
+      }
 
-// Opens the form to save a brand new event
-function openCalendarModal(key) {
-  selectedCalendarDate = key;
-  editingEventIndex = null; // Clear out index because this is a NEW event
-  calendarLastFocusedElement = document.activeElement;
-  
-  const modal = document.getElementById('calendar-modal');
-  const modalTitle = document.getElementById('calendar-modal-title');
-  const titleInput = document.getElementById('calendar-event-title');
-  const detailsInput = document.getElementById('calendar-event-details');
-  const deleteEvent = document.getElementById('delete-event');
-  if(!modal || !titleInput || !detailsInput) return;
-  
-  modalTitle.textContent = 'New Task';
-  titleInput.value = '';
-  detailsInput.value = '';
-  deleteEvent.style.display = 'none';
-  modal.style.display = 'flex';
-  modal.setAttribute('aria-hidden', 'false');
-  titleInput.focus();
-}
+      function closeCalendarModal() {
+        const modal = document.getElementById('calendar-modal');
+        if (modal) {
+          modal.style.display = 'none';
+          modal.setAttribute('aria-hidden', 'true');
+        }
+        selectedCalendarDate = null;
+      }
 
-
-// Opens the form with existing data populated for editing
-function openEventModal(key, index) {
-  selectedCalendarDate = key;
-  editingEventIndex = index; // Store the exact index of the event we are changing
-  calendarLastFocusedElement = document.activeElement;
-  
-  const modal = document.getElementById('calendar-modal');
-  const modalTitle = document.getElementById('calendar-modal-title');
-  const titleInput = document.getElementById('calendar-event-title');
-  const detailsInput = document.getElementById('calendar-event-details');
-  const deleteEvent = document.getElementById('delete-event');
-  if(!modal || !titleInput || !detailsInput) return;
-
-  // Retrieve the target item details using the array index
-  const dayEvents = calendarEvents[key] || [];
-  const foundEvent = dayEvents[index];
-  if (!foundEvent) return;
-
-  modalTitle.textContent = 'Edit Task';
-  titleInput.value = foundEvent.title;
-  detailsInput.value = foundEvent.details || '';
-  deleteEvent.style.display = '';
-  modal.style.display = 'flex';
-  modal.setAttribute('aria-hidden', 'false');
-  titleInput.focus();
-}
-
-function deleteCalendarEvent() {
-  // Guard check to make sure a date and specific event index are active
-  if (!selectedCalendarDate || editingEventIndex === null) return;
-  
-  const dayEvents = calendarEvents[selectedCalendarDate];
-  if (!Array.isArray(dayEvents)) return;
-
-  // Remove the specific item from the array using its index position
-  dayEvents.splice(editingEventIndex, 1);
-
-  // Clean up: If no events are left on this date, delete the key entirely
-  if (dayEvents.length === 0) {
-    delete calendarEvents[selectedCalendarDate];
-  }
-
-  save();              // Sync changes to your global storage utility
-  closeCalendarModal(); // Close the active window view
-  renderCalendar();     // Force a UI repaint to reflect changes on the grid
-  toast('Event deleted');
-}
-
-
-function closeCalendarModal() {
-  const modal = document.getElementById('calendar-modal');
-  if (modal) {
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-  }
-  selectedCalendarDate = null;
-}
-
-function closeCalendarModalOnBackdrop(event) {
-  if (event.target.id === 'calendar-modal') {
-    closeCalendarModal();
-  }
-}
-
-// Saves either the brand new event or overrides the edited index entry
-function saveCalendarEvent() {
-  if (!selectedCalendarDate) return;
-  const title = document.getElementById('calendar-event-title').value.trim();
-  const details = document.getElementById('calendar-event-details').value.trim();
-  if (!title) { toast('Enter an event title', false); return; }
-  
-  if (!Array.isArray(calendarEvents[selectedCalendarDate])) {
-    calendarEvents[selectedCalendarDate] = [];
-  }
-  
-  if (editingEventIndex !== null) {
-    // We are editing an existing item, overwrite it at its index position
-    calendarEvents[selectedCalendarDate][editingEventIndex] = { title, details };
-    toast('Event updated');
-  } else {
-    // We are adding a fresh item
-    calendarEvents[selectedCalendarDate].push({ title, details });
-    toast('Event saved');
-  }
-
-  save();
-  closeCalendarModal();
-  renderCalendar();
-}
-
-
-// ── Import list ──────────────────────────────────────────────
-function renderImportedList() {
-  document.getElementById('panel-assignments').style.display = 'none';
-  document.getElementById('panel-games').style.display = 'none';
-  document.title = 'GradeBook | Import';
-  
-  const el = document.getElementById('imported-list');
-  
-  if (!classes.length) {
-    el.innerHTML = '';
-    return;
-  }
-  
-  el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` + 
-    classes.map((c, i) => `
+      function closeCalendarModalOnBackdrop(event) {
+        if (event.target.id === 'calendar-modal') {
+          closeCalendarModal();
+        }
+      }
+      // Saves either the brand new event or overrides the edited index entry
+      function saveCalendarEvent() {
+        if (!selectedCalendarDate) return;
+        const title = document.getElementById('calendar-event-title').value.trim();
+        const details = document.getElementById('calendar-event-details').value.trim();
+        if (!title) {
+          toast('Enter an event title', false);
+          return;
+        }
+        if (!Array.isArray(calendarEvents[selectedCalendarDate])) {
+          calendarEvents[selectedCalendarDate] = [];
+        }
+        if (editingEventIndex !== null) {
+          // We are editing an existing item, overwrite it at its index position
+          calendarEvents[selectedCalendarDate][editingEventIndex] = {
+            title,
+            details
+          };
+          toast('Event updated');
+        } else {
+          // We are adding a fresh item
+          calendarEvents[selectedCalendarDate].push({
+            title,
+            details
+          });
+          toast('Event saved');
+        }
+        save();
+        closeCalendarModal();
+        renderCalendar();
+      }
+      // ── Import list ──────────────────────────────────────────────
+      function renderImportedList() {
+        document.getElementById('panel-assignments').style.display = 'none';
+        document.getElementById('panel-games').style.display = 'none';
+        document.title = 'GradeBook | Import';
+        const el = document.getElementById('imported-list');
+        if (!classes.length) {
+          el.innerHTML = '';
+          return;
+        }
+        el.innerHTML = `<div class="sidebar-label" style="margin-bottom:8px">Imported classes</div>` +
+          classes.map((c, i) => `
       <div class="imported-row">
         <div>
           <span style="font-size:14px;font-weight:500">${c.name}</span>
@@ -1646,412 +2622,487 @@ function renderImportedList() {
         </div>
       </div>
     `).join('');
-}
-
-
-async function renderGames() {
-    openGamePopup();
-    document.title = 'GradeBook | Rewards';
-  
-}
-
-function openGamePopup() {
-  
-  const gamePopup = document.getElementById('game-popup');
-
-  gamePopup.style.display = 'flex';
-  gamePopup.setAttribute('aria-hidden', 'false');
-}
-
-function closeGamePopup() {
-  const gamePopup = document.getElementById('game-popup');
-  if (gamePopup) {
-    gamePopup.style.display = 'none';
-    gamePopup.setAttribute('aria-hidden', 'true');
-  }
-}
-
-
-
-// ── Settings ─────────────────────────────────────────────────
-const SETTING_DEFAULTS = {
-  compactMode:   false,
-  showPeriod:    true,
-  showPct:       true,
-  lowThreshold:  '70',
-  assignSort:    'newest',
-  autoPriority:  '70',
-  hideCompleted: 'never',
-  accentColor:   '#7c6ef4',
-  hideGrades: false,
-  notificationsEnabled: false,
-  notificationLeadDays: '1',
-};
-
-let settings = { ...SETTING_DEFAULTS, ...readStoredJSON('mst_settings', {}) };
-
-async function checkForUpdates() {
-  try {
-    const response = await fetch("https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json");
-    
-    const data = await response.json();
-    const version = data.version; // Access the version property from the JSON object
-
-    if (APP_VERSION !== version) {
-      window.location.reload();
-    }
-  } catch (error) {
-    console.error("Update failed:", error);
-  }
-}
-
-
-function updateCustomColor(hex) {
-  saveSetting('accentColor', hex);
-  renderSettings(); // This redraws the swatches with the new hex
-}
-
-function saveSetting(key, value) {
-  settings[key] = value;
-  localStorage.setItem('mst_settings', JSON.stringify(settings));
-  applySettings();
-  if (key === 'notificationLeadDays' || key === 'notificationsEnabled') {
-    checkReminderNotifications();
-  }
-}
-
-function toggleSetting(key) {
-  saveSetting(key, !settings[key]);
-  console.log(key)
-  renderSettings();
-}
-
-function notificationsSupported() {
-  return typeof window !== 'undefined' && 'Notification' in window;
-}
-
-function notificationPermissionState() {
-  if (!notificationsSupported()) return 'unsupported';
-  return Notification.permission;
-}
-
-async function requestNotificationPermission() {
-  if (!notificationsSupported()) {
-    toast('Browser notifications are not supported here.', false);
-    return false;
-  }
-  if (Notification.permission === 'granted') return true;
-  if (Notification.permission === 'denied') {
-    toast('Notification permission is blocked in your browser settings.', false);
-    return false;
-  }
-  try {
-    const result = await Notification.requestPermission();
-    if (result === 'granted') return true;
-    toast('Notifications stay off until you allow browser permission.', false);
-    return false;
-  } catch (error) {
-    console.warn('Notification permission request failed', error);
-    toast('Unable to request notification permission right now.', false);
-    return false;
-  }
-}
-
-async function toggleNotificationsSetting() {
-  const shouldEnable = !settings.notificationsEnabled;
-  if (!shouldEnable) {
-    saveSetting('notificationsEnabled', false);
-    renderSettings();
-    toast('Notifications disabled');
-    return;
-  }
-
-  const granted = await requestNotificationPermission();
-  saveSetting('notificationsEnabled', granted);
-  renderSettings();
-  if (granted) {
-    toast('Notifications enabled');
-    checkReminderNotifications();
-  }
-}
-
-function startOfLocalDay(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function parseDateOnly(dateString) {
-  if (typeof dateString !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return null;
-  const [year, month, day] = dateString.split('-').map(Number);
-  const parsed = new Date(year, month - 1, day);
-  if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
-  return parsed;
-}
-
-function classifyReminderDay(dateString, leadDays) {
-  const dueDate = parseDateOnly(dateString);
-  if (!dueDate) return null;
-  const today = startOfLocalDay(new Date());
-  const dayDelta = Math.round((startOfLocalDay(dueDate).getTime() - today.getTime()) / 86400000);
-  if (dayDelta < 0) return null;
-  if (dayDelta === 0) return 'due';
-  if (leadDays > 0 && dayDelta === leadDays) return 'upcoming';
-  return null;
-}
-
-function sendReminderNotification(title, body, tag) {
-  if (!notificationsSupported() || Notification.permission !== 'granted') return false;
-  try {
-    new Notification(title, { body, tag, renotify: false });
-    return true;
-  } catch (error) {
-    console.warn('Failed to show notification', error);
-    return false;
-  }
-}
-
-function pruneNotifiedReminders() {
-  if (!notifiedReminders || typeof notifiedReminders !== 'object' || Array.isArray(notifiedReminders)) {
-    notifiedReminders = {};
-    return;
-  }
-  const cutoff = Date.now() - (45 * 24 * 60 * 60 * 1000);
-  let changed = false;
-  Object.keys(notifiedReminders).forEach(key => {
-    if (typeof notifiedReminders[key] !== 'number' || notifiedReminders[key] < cutoff) {
-      delete notifiedReminders[key];
-      changed = true;
-    }
-  });
-  if (changed) saveNotifiedReminders();
-}
-
-function checkReminderNotifications() {
-  pruneNotifiedReminders();
-  if (!settings.notificationsEnabled) return;
-  if (!notificationsSupported() || Notification.permission !== 'granted') return;
-
-  const leadDays = Math.max(0, parseInt(settings.notificationLeadDays, 10) || 0);
-  let hasNewReminder = false;
-
-  tasks.forEach(task => {
-    if (!task || task.completed || !task.title || !task.due) return;
-    const reminderType = classifyReminderDay(task.due, leadDays);
-    if (!reminderType) return;
-    const className = classes.find(c => c.code === task.classCode)?.name;
-    const reminderKey = `task|${task.id}|${task.due}|${reminderType}|${leadDays}`;
-    if (notifiedReminders[reminderKey]) return;
-    const dateText = parseDateOnly(task.due)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) || task.due;
-    const body = reminderType === 'due'
-      ? `${task.title} is due today${className ? ` · ${className}` : ''}.`
-      : `${task.title} is due on ${dateText}${className ? ` · ${className}` : ''}.`;
-    if (sendReminderNotification('Task reminder', body, reminderKey)) {
-      notifiedReminders[reminderKey] = Date.now();
-      hasNewReminder = true;
-    }
-  });
-
-  Object.entries(calendarEvents || {}).forEach(([dateKey, dayEvents]) => {
-    if (!Array.isArray(dayEvents)) return;
-    const reminderType = classifyReminderDay(dateKey, leadDays);
-    if (!reminderType) return;
-    const dateText = parseDateOnly(dateKey)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) || dateKey;
-    dayEvents.forEach((eventItem, index) => {
-      const title = eventItem?.title?.trim();
-      if (!title) return;
-      const details = (eventItem?.details || '').trim();
-      const reminderKey = `calendar|${dateKey}|${index}|${title}|${details}|${reminderType}|${leadDays}`;
-      if (notifiedReminders[reminderKey]) return;
-      const body = reminderType === 'due'
-        ? `${title} is scheduled for today.`
-        : `${title} is scheduled for ${dateText}.`;
-      if (sendReminderNotification('Calendar reminder', body, reminderKey)) {
-        notifiedReminders[reminderKey] = Date.now();
-        hasNewReminder = true;
       }
-    });
-  });
 
-  if (hasNewReminder) saveNotifiedReminders();
-}
+      function renderGames() {
+        document.getElementById('panel-games').style.display = 'none';
+        const allGrades = classes.map(c => c.grade || '—');
+        console.log(allGrades); // Outputs something like: ["A", "B+", "—", "A-"]
+        // 1. Define the grade scale hierarchy (higher number = better grade)
+        const gradeScale = {
+          "A+": 12,
+          "A": 11,
+          "A-": 10,
+          "B+": 9,
+          "B": 8,
+          "B-": 7,
+          "C+": 6,
+          "C": 5,
+          "C-": 4,
+          "D+": 3,
+          "D": 2,
+          "D-": 1,
+          "F": 0
+        };
+        const thresholdValue = gradeScale["B-"]; // Numeric value is 7
+        // 2. Check if any value is less than B-
+        // If a grade isn't in the scale (like "—"), we default it to Infinity using ??
+        const hasLowGrades = allGrades.some(g => {
+          const score = gradeScale[g] ?? Infinity;
+          return score < thresholdValue;
+        });
+        if (hasLowGrades === true) {
+          openBadGradesGamePopup()
+          return;
+        }
+        openGamePopup();
+        document.title = 'GradeBook | Rewards';
+      }
 
-function applySettings() {
-  // Accent color
-  document.documentElement.style.setProperty('--accent', settings.accentColor);
+      function closeBadGradesGamePopup() {
+        const gamePopup = document.getElementById('bad-grades-popup');
+        if (gamePopup) {
+          gamePopup.style.display = 'none';
+          gamePopup.setAttribute('aria-hidden', 'true');
+        }
+        nav('grades')
+      }
 
-  // Darken accent for accent2 (simple lightening via opacity trick)
-  document.documentElement.style.setProperty('--accent2', settings.accentColor + 'cc');
+      function openBadGradesGamePopup() {
+        const gamePopup = document.getElementById('bad-grades-popup');
+        gamePopup.style.display = 'flex';
+        gamePopup.setAttribute('aria-hidden', 'false');
+      }
 
-  document.getElementById('')
+      function openGamePopup() {
+        const gamePopup = document.getElementById('game-popup');
+        gamePopup.style.display = 'flex';
+        gamePopup.setAttribute('aria-hidden', 'false');
+      }
 
-  // Compact mode
-  document.body.classList.toggle('compact', !!settings.compactMode);
-  document.body.classList.toggle('hideGrades', !!settings.hideGrades);
+      function closeGamePopup() {
+        const gamePopup = document.getElementById('game-popup');
+        if (gamePopup) {
+          gamePopup.style.display = 'none';
+          gamePopup.setAttribute('aria-hidden', 'true');
+        }
+        nav('grades')
+      }
+      // ── Settings ─────────────────────────────────────────────────
+      const SETTING_DEFAULTS = {
+        compactMode: false,
+        showPeriod: true,
+        showPct: true,
+        lowThreshold: '70',
+        assignSort: 'newest',
+        autoPriority: '70',
+        hideCompleted: 'never',
+        accentColor: '#7c6ef4',
+        hideGrades: false,
+        notificationsEnabled: false,
+        notificationLeadDays: '1',
+      };
+      let settings = {
+        ...SETTING_DEFAULTS,
+        ...readStoredJSON('mst_settings', {})
+      };
+      async function checkForUpdates() {
+        try {
+          const response = await fetch("https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json");
+          const data = await response.json();
+          const version = data.version; // Access the version property from the JSON object
+          if (APP_VERSION !== version) {
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error("Update failed:", error);
+        }
+      }
 
-  // Favicon update
-  const favicon = document.querySelector('link[rel="icon"]');
-  if (favicon) {
-    const cleanColor = settings.accentColor.replace('#', '');
-    favicon.href = `https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=${cleanColor}`;
-  }
-}
+      function updateCustomColor(hex) {
+        saveSetting('accentColor', hex);
+        renderSettings(); // This redraws the swatches with the new hex
+      }
 
+      function saveSetting(key, value) {
+        settings[key] = value;
+        localStorage.setItem('mst_settings', JSON.stringify(settings));
+        applySettings();
+        if (key === 'notificationLeadDays' || key === 'notificationsEnabled') {
+          checkReminderNotifications();
+        }
+      }
 
-function renderSettings() {
-  document.getElementById("panel-assignments").style.display = 'none'
-  document.getElementById("panel-games").style.display = 'none'
-  document.title = "GradeBook | Settings";
-  // Toggles
-  ['compact','period','showPct','hideGrades','notifications'].forEach(key => {
-    const map = { compact: 'compactMode', period: 'showPeriod', showPct: 'showPct', hideGrades: 'hideGrades', notifications: 'notificationsEnabled' };
-    const el = document.getElementById('toggle-' + key);
-    if (el) el.classList.toggle('on', !!settings[map[key]]);
-  });
+      function toggleSetting(key) {
+        saveSetting(key, !settings[key]);
+        console.log(key)
+        renderSettings();
+      }
 
-  // Selects
-  ['lowThreshold','assignSort','autoPriority','hideCompleted','notificationLeadDays'].forEach(key => {
-    const el = document.getElementById('setting-' + key);
-    if (el) el.value = settings[key];
-  });
-  const notificationLeadSelect = document.getElementById('setting-notificationLeadDays');
-  if (notificationLeadSelect) notificationLeadSelect.disabled = !settings.notificationsEnabled;
+      function notificationsSupported() {
+        return typeof window !== 'undefined' && 'Notification' in window;
+      }
 
-  const notificationStatus = document.getElementById('notifications-permission-state');
-  if (notificationStatus) {
-    const permission = notificationPermissionState();
-    if (permission === 'unsupported') notificationStatus.textContent = 'This browser does not support notifications for this app.';
-    else if (permission === 'granted') notificationStatus.textContent = 'Permission granted. Reminders can be shown while this tab is open.';
-    else if (permission === 'denied') notificationStatus.textContent = 'Permission blocked. Enable notifications for this site in browser settings.';
-    else notificationStatus.textContent = 'Permission not granted yet. Turn on notifications to request access.';
-  }
+      function notificationPermissionState() {
+        if (!notificationsSupported()) return 'unsupported';
+        return Notification.permission;
+      }
+      async function requestNotificationPermission() {
+        if (!notificationsSupported()) {
+          toast('Browser notifications are not supported here.', false);
+          return false;
+        }
+        if (Notification.permission === 'granted') return true;
+        if (Notification.permission === 'denied') {
+          toast('Notification permission is blocked in your browser settings.', false);
+          return false;
+        }
+        try {
+          const result = await Notification.requestPermission();
+          if (result === 'granted') return true;
+          toast('Notifications stay off until you allow browser permission.', false);
+          return false;
+        } catch (error) {
+          console.warn('Notification permission request failed', error);
+          toast('Unable to request notification permission right now.', false);
+          return false;
+        }
+      }
+      async function toggleNotificationsSetting() {
+        const shouldEnable = !settings.notificationsEnabled;
+        if (!shouldEnable) {
+          saveSetting('notificationsEnabled', false);
+          renderSettings();
+          toast('Notifications disabled');
+          return;
+        }
+        const granted = await requestNotificationPermission();
+        saveSetting('notificationsEnabled', granted);
+        renderSettings();
+        if (granted) {
+          toast('Notifications enabled');
+          checkReminderNotifications();
+        }
+      }
 
-  const sw = document.getElementById('color-swatches');
-  if (sw) {
-    // Define colors inside render so "Custom" can update
-    const currentPickerColor = document.getElementById('picker').value;
-    const colors = [
-      { hex: '#7c6ef4', name: 'Violet' },
-      { hex: '#60a5fa', name: 'Blue'   },
-      { hex: '#4ade80', name: 'Green'  },
-      { hex: '#f472b6', name: 'Pink'   },
-      { hex: '#fb923c', name: 'Orange' },
-      { hex: '#a78bfa', name: 'Purple' },
-      { hex: currentPickerColor, name: 'Custom' },
-    ];
+      function startOfLocalDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
 
-    sw.innerHTML = colors.map(c =>
-      `<div onclick="saveSetting('accentColor','${c.hex}'); renderSettings();"
+      function parseDateOnly(dateString) {
+        if (typeof dateString !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return null;
+        const [year, month, day] = dateString.split('-').map(Number);
+        const parsed = new Date(year, month - 1, day);
+        if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
+        return parsed;
+      }
+
+      function classifyReminderDay(dateString, leadDays) {
+        const dueDate = parseDateOnly(dateString);
+        if (!dueDate) return null;
+        const today = startOfLocalDay(new Date());
+        const dayDelta = Math.round((startOfLocalDay(dueDate).getTime() - today.getTime()) / 86400000);
+        if (dayDelta < 0) return null;
+        if (dayDelta === 0) return 'due';
+        if (leadDays > 0 && dayDelta === leadDays) return 'upcoming';
+        return null;
+      }
+
+      function sendReminderNotification(title, body, tag) {
+        if (!notificationsSupported() || Notification.permission !== 'granted') return false;
+        try {
+          new Notification(title, {
+            body,
+            tag,
+            renotify: false
+          });
+          return true;
+        } catch (error) {
+          console.warn('Failed to show notification', error);
+          return false;
+        }
+      }
+
+      function pruneNotifiedReminders() {
+        if (!notifiedReminders || typeof notifiedReminders !== 'object' || Array.isArray(notifiedReminders)) {
+          notifiedReminders = {};
+          return;
+        }
+        const cutoff = Date.now() - (45 * 24 * 60 * 60 * 1000);
+        let changed = false;
+        Object.keys(notifiedReminders).forEach(key => {
+          if (typeof notifiedReminders[key] !== 'number' || notifiedReminders[key] < cutoff) {
+            delete notifiedReminders[key];
+            changed = true;
+          }
+        });
+        if (changed) saveNotifiedReminders();
+      }
+
+      function checkReminderNotifications() {
+        pruneNotifiedReminders();
+        if (!settings.notificationsEnabled) return;
+        if (!notificationsSupported() || Notification.permission !== 'granted') return;
+        const leadDays = Math.max(0, parseInt(settings.notificationLeadDays, 10) || 0);
+        let hasNewReminder = false;
+        tasks.forEach(task => {
+          if (!task || task.completed || !task.title || !task.due) return;
+          const reminderType = classifyReminderDay(task.due, leadDays);
+          if (!reminderType) return;
+          const className = classes.find(c => c.code === task.classCode)?.name;
+          const reminderKey = `task|${task.id}|${task.due}|${reminderType}|${leadDays}`;
+          if (notifiedReminders[reminderKey]) return;
+          const dateText = parseDateOnly(task.due)?.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          }) || task.due;
+          const body = reminderType === 'due' ?
+            `${task.title} is due today${className ? ` · ${className}` : ''}.` :
+            `${task.title} is due on ${dateText}${className ? ` · ${className}` : ''}.`;
+          if (sendReminderNotification('Task reminder', body, reminderKey)) {
+            notifiedReminders[reminderKey] = Date.now();
+            hasNewReminder = true;
+          }
+        });
+        Object.entries(calendarEvents || {}).forEach(([dateKey, dayEvents]) => {
+          if (!Array.isArray(dayEvents)) return;
+          const reminderType = classifyReminderDay(dateKey, leadDays);
+          if (!reminderType) return;
+          const dateText = parseDateOnly(dateKey)?.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          }) || dateKey;
+          dayEvents.forEach((eventItem, index) => {
+            const title = eventItem?.title?.trim();
+            if (!title) return;
+            const details = (eventItem?.details || '').trim();
+            const reminderKey = `calendar|${dateKey}|${index}|${title}|${details}|${reminderType}|${leadDays}`;
+            if (notifiedReminders[reminderKey]) return;
+            const body = reminderType === 'due' ?
+              `${title} is scheduled for today.` :
+              `${title} is scheduled for ${dateText}.`;
+            if (sendReminderNotification('Calendar reminder', body, reminderKey)) {
+              notifiedReminders[reminderKey] = Date.now();
+              hasNewReminder = true;
+            }
+          });
+        });
+        if (hasNewReminder) saveNotifiedReminders();
+      }
+
+      function applySettings() {
+        // Accent color
+        document.documentElement.style.setProperty('--accent', settings.accentColor);
+        // Darken accent for accent2 (simple lightening via opacity trick)
+        document.documentElement.style.setProperty('--accent2', settings.accentColor + 'cc');
+        document.getElementById('')
+        // Compact mode
+        document.body.classList.toggle('compact', !!settings.compactMode);
+        document.body.classList.toggle('hideGrades', !!settings.hideGrades);
+        // Favicon update
+        const favicon = document.querySelector('link[rel="icon"]');
+        if (favicon) {
+          const cleanColor = settings.accentColor.replace('#', '');
+          favicon.href = `https://img.icons8.com/?size=100&id=gkq48EmsXBcu&format=png&color=${cleanColor}`;
+        }
+      }
+
+      function renderSettings() {
+        document.getElementById("panel-assignments").style.display = 'none'
+        document.getElementById("panel-games").style.display = 'none'
+        document.title = "GradeBook | Settings";
+        // Toggles
+        ['compact', 'period', 'showPct', 'hideGrades', 'notifications'].forEach(key => {
+          const map = {
+            compact: 'compactMode',
+            period: 'showPeriod',
+            showPct: 'showPct',
+            hideGrades: 'hideGrades',
+            notifications: 'notificationsEnabled'
+          };
+          const el = document.getElementById('toggle-' + key);
+          if (el) el.classList.toggle('on', !!settings[map[key]]);
+        });
+        // Selects
+        ['lowThreshold', 'assignSort', 'autoPriority', 'hideCompleted', 'notificationLeadDays'].forEach(key => {
+          const el = document.getElementById('setting-' + key);
+          if (el) el.value = settings[key];
+        });
+        const notificationLeadSelect = document.getElementById('setting-notificationLeadDays');
+        if (notificationLeadSelect) notificationLeadSelect.disabled = !settings.notificationsEnabled;
+        const notificationStatus = document.getElementById('notifications-permission-state');
+        if (notificationStatus) {
+          const permission = notificationPermissionState();
+          if (permission === 'unsupported') notificationStatus.textContent = 'This browser does not support notifications for this app.';
+          else if (permission === 'granted') notificationStatus.textContent = 'Permission granted. Reminders can be shown while this tab is open.';
+          else if (permission === 'denied') notificationStatus.textContent = 'Permission blocked. Enable notifications for this site in browser settings.';
+          else notificationStatus.textContent = 'Permission not granted yet. Turn on notifications to request access.';
+        }
+        const sw = document.getElementById('color-swatches');
+        if (sw) {
+          // Define colors inside render so "Custom" can update
+          const currentPickerColor = document.getElementById('picker').value;
+          const colors = [{
+              hex: '#7c6ef4',
+              name: 'Violet'
+            },
+            {
+              hex: '#60a5fa',
+              name: 'Blue'
+            },
+            {
+              hex: '#4ade80',
+              name: 'Green'
+            },
+            {
+              hex: '#f472b6',
+              name: 'Pink'
+            },
+            {
+              hex: '#fb923c',
+              name: 'Orange'
+            },
+            {
+              hex: '#a78bfa',
+              name: 'Purple'
+            },
+            {
+              hex: currentPickerColor,
+              name: 'Custom'
+            },
+          ];
+          sw.innerHTML = colors.map(c =>
+            `<div onclick="saveSetting('accentColor','${c.hex}'); renderSettings();"
         title="${c.name}"
         style="width:22px;height:22px;border-radius:50%;background:${c.hex};cursor:pointer;
                border:2px solid ${settings.accentColor.toLowerCase() === c.hex.toLowerCase() ? '#fff' : 'transparent'};
                box-shadow: 0 0 0 1px ${settings.accentColor.toLowerCase() === c.hex.toLowerCase() ? '#0002' : 'transparent'};
                transition: all 0.15s;"></div>`
-    ).join('');
-  }
+          ).join('');
+        }
+        // Storage usage
+        const usageEl = document.getElementById('storage-usage');
+        if (usageEl) {
+          try {
+            const bytes = new Blob([localStorage.getItem('mst_classes') || '', localStorage.getItem('mst_tasks') || '']).size;
+            usageEl.textContent = bytes < 1024 ?
+              `${bytes} bytes used` :
+              `${(bytes/1024).toFixed(1)} KB used · ${classes.length} class${classes.length!==1?'es':''}, ${tasks.length} task${tasks.length!==1?'s':''}`;
+          } catch (e) {
+            usageEl.textContent = 'Unable to calculate';
+          }
+        }
+      }
 
-  // Storage usage
-  const usageEl = document.getElementById('storage-usage');
-  if (usageEl) {
-    try {
-      const bytes = new Blob([localStorage.getItem('mst_classes')||'', localStorage.getItem('mst_tasks')||'']).size;
-      usageEl.textContent = bytes < 1024
-        ? `${bytes} bytes used`
-        : `${(bytes/1024).toFixed(1)} KB used · ${classes.length} class${classes.length!==1?'es':''}, ${tasks.length} task${tasks.length!==1?'s':''}`;
-    } catch(e) { usageEl.textContent = 'Unable to calculate'; }
-  }
-}
+      function exportData() {
+        const blob = new Blob([JSON.stringify({
+          classes,
+          tasks,
+          settings
+        }, null, 2)], {
+          type: 'application/json'
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `gradebook-backup-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        toast('Backup downloaded');
+      }
 
-function exportData() {
-  const blob = new Blob([JSON.stringify({ classes, tasks, settings }, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `gradebook-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  toast('Backup downloaded');
-}
+      function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (data.classes) {
+              classes = data.classes;
+              localStorage.setItem('mst_classes', JSON.stringify(classes));
+            }
+            if (data.tasks) {
+              tasks = data.tasks;
+              localStorage.setItem('mst_tasks', JSON.stringify(tasks));
+            }
+            if (data.settings) {
+              settings = {
+                ...SETTING_DEFAULTS,
+                ...data.settings
+              };
+              localStorage.setItem('mst_settings', JSON.stringify(settings));
+            }
+            rebuildClassSelects();
+            applySettings();
+            renderSettings();
+            toast(`Restored: ${classes.length} classes, ${tasks.length} tasks`);
+          } catch (err) {
+            toast('Invalid backup file', false);
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+      }
 
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.classes) { classes = data.classes; localStorage.setItem('mst_classes', JSON.stringify(classes)); }
-      if (data.tasks)   { tasks   = data.tasks;   localStorage.setItem('mst_tasks',   JSON.stringify(tasks));   }
-      if (data.settings){ settings = { ...SETTING_DEFAULTS, ...data.settings }; localStorage.setItem('mst_settings', JSON.stringify(settings)); }
+      function clearAllTasks() {
+        if (!confirm('Delete all tasks? This cannot be undone.')) return;
+        tasks = [];
+        save();
+        toast('All tasks cleared');
+      }
+
+      function clearAllData() {
+        if (!confirm('Delete ALL classes, assignments, and tasks? This cannot be undone.')) return;
+        classes = [];
+        tasks = [];
+        notifiedReminders = {};
+        save();
+        saveNotifiedReminders();
+        rebuildClassSelects();
+        renderGrades();
+        toast('All data cleared');
+      }
+
+      function deleteClass(i) {
+        const code = classes[i].code;
+        classes.splice(i, 1);
+        tasks = tasks.filter(t => t.classCode !== code);
+        save();
+        rebuildClassSelects();
+        renderImportedList();
+        toast('Class removed');
+      }
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.getElementById('calendar-modal').style.display === 'flex') {
+          closeCalendarModal();
+        }
+      });
+      // ── Init ─────────────────────────────────────────────────────
       rebuildClassSelects();
       applySettings();
-      renderSettings();
-      toast(`Restored: ${classes.length} classes, ${tasks.length} tasks`);
-    } catch(err) { toast('Invalid backup file', false); }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
+      ensureCalendarWeekdays();
+      renderGrades();
+      setInterval(() => {
+        checkForUpdates();
+        checkReminderNotifications();
+      }, 60000);
+      checkReminderNotifications();
+    </script>
+    <script>
+      const ROWS = 10;
+      const COLS = 10;
+      const MINES = 10;
+      let grid = [];
+      let gameOver = false;
+      let minesLeft = MINES;
+      let timerInterval = null;
+      let timeElapsed = 0;
+      let firstClick = true;
+      const gridEl = document.getElementById('grid');
+      const mineCountEl = document.getElementById('mine-count');
+      const timerEl = document.getElementById('timer');
+      const resetBtn = document.getElementById('reset-btn');
 
-function clearAllTasks() {
-  if (!confirm('Delete all tasks? This cannot be undone.')) return;
-  tasks = [];
-  save();
-  toast('All tasks cleared');
-}
-
-function clearAllData() {
-  if (!confirm('Delete ALL classes, assignments, and tasks? This cannot be undone.')) return;
-  classes = []; tasks = [];
-  notifiedReminders = {};
-  save();
-  saveNotifiedReminders();
-  rebuildClassSelects();
-  renderGrades();
-  toast('All data cleared');
-}
-
-function deleteClass(i) {
-  const code = classes[i].code;
-  classes.splice(i, 1);
-  tasks = tasks.filter(t => t.classCode !== code);
-  save();
-  rebuildClassSelects();
-  renderImportedList();
-  toast('Class removed');
-}
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && document.getElementById('calendar-modal').style.display === 'flex') {
-    closeCalendarModal();
-  }
-});
-
-// ── Init ─────────────────────────────────────────────────────
-rebuildClassSelects();
-applySettings();
-ensureCalendarWeekdays();
-renderGrades();
-setInterval(() => {
-  checkForUpdates();
-  checkReminderNotifications();
-}, 60000);
-checkReminderNotifications();
-</script>
-<script>
-    const ROWS = 10;
-    const COLS = 10;
-    const MINES = 10;
-    
-    let grid = [];
-    let gameOver = false;
-    let minesLeft = MINES;
-    let timerInterval = null;
-    let timeElapsed = 0;
-    let firstClick = true;
-
-    const gridEl = document.getElementById('grid');
-    const mineCountEl = document.getElementById('mine-count');
-    const timerEl = document.getElementById('timer');
-    const resetBtn = document.getElementById('reset-btn');
-
-    function initGame() {
+      function initGame() {
         gridEl.innerHTML = '';
         grid = [];
         gameOver = false;
@@ -2059,150 +3110,137 @@ checkReminderNotifications();
         timeElapsed = 0;
         firstClick = true;
         clearInterval(timerInterval);
-        
         mineCountEl.textContent = String(minesLeft).padStart(3, '0');
         timerEl.textContent = '000';
         resetBtn.textContent = '🙂';
-
         // Create empty board array
         for (let r = 0; r < ROWS; r++) {
-            grid[r] = [];
-            for (let c = 0; c < COLS; c++) {
-                const cell = {
-                    r, c,
-                    isMine: false,
-                    isRevealed: false,
-                    isFlagged: false,
-                    neighborMines: 0,
-                    element: document.createElement('div')
-                };
-                cell.element.classList.add('minesweeper-cell');
-                
-                // Left click to reveal
-                cell.element.addEventListener('click', () => revealCell(cell));
-                
-                // Right click to flag
-                cell.element.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    toggleFlag(cell);
-                });
-
-                gridEl.appendChild(cell.element);
-                grid[r][c] = cell;
-            }
+          grid[r] = [];
+          for (let c = 0; c < COLS; c++) {
+            const cell = {
+              r,
+              c,
+              isMine: false,
+              isRevealed: false,
+              isFlagged: false,
+              neighborMines: 0,
+              element: document.createElement('div')
+            };
+            cell.element.classList.add('minesweeper-cell');
+            // Left click to reveal
+            cell.element.addEventListener('click', () => revealCell(cell));
+            // Right click to flag
+            cell.element.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              toggleFlag(cell);
+            });
+            gridEl.appendChild(cell.element);
+            grid[r][c] = cell;
+          }
         }
-    }
+      }
 
-    function startTimer() {
+      function startTimer() {
         timerInterval = setInterval(() => {
-            timeElapsed = Math.min(timeElapsed + 1, 999);
-            timerEl.textContent = String(timeElapsed).padStart(3, '0');
+          timeElapsed = Math.min(timeElapsed + 1, 999);
+          timerEl.textContent = String(timeElapsed).padStart(3, '0');
         }, 1000);
-    }
+      }
 
-    function generateMines(firstCell) {
+      function generateMines(firstCell) {
         let placed = 0;
         while (placed < MINES) {
-            let r = Math.floor(Math.random() * ROWS);
-            let c = Math.floor(Math.random() * COLS);
-            
-            // Prevent mine on first click or duplicate placement
-            if (!grid[r][c].isMine && (r !== firstCell.r || c !== firstCell.c)) {
-                grid[r][c].isMine = true;
-                placed++;
-            }
+          let r = Math.floor(Math.random() * ROWS);
+          let c = Math.floor(Math.random() * COLS);
+          // Prevent mine on first click or duplicate placement
+          if (!grid[r][c].isMine && (r !== firstCell.r || c !== firstCell.c)) {
+            grid[r][c].isMine = true;
+            placed++;
+          }
         }
-
         // Calculate neighbor numbers
         for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (!grid[r][c].isMine) {
-                    grid[r][c].neighborMines = countNeighbors(r, c);
-                }
+          for (let c = 0; c < COLS; c++) {
+            if (!grid[r][c].isMine) {
+              grid[r][c].neighborMines = countNeighbors(r, c);
             }
+          }
         }
-    }
+      }
 
-    function countNeighbors(row, col) {
+      function countNeighbors(row, col) {
         let count = 0;
         for (let dr = -1; dr <= 1; dr++) {
-            for (let dc = -1; dc <= 1; dc++) {
-                if (grid[row + dr]?.[col + dc]?.isMine) count++;
-            }
+          for (let dc = -1; dc <= 1; dc++) {
+            if (grid[row + dr]?.[col + dc]?.isMine) count++;
+          }
         }
         return count;
-    }
+      }
 
-    function revealCell(cell) {
+      function revealCell(cell) {
         if (gameOver || cell.isRevealed || cell.isFlagged) return;
-
         if (firstClick) {
-            firstClick = false;
-            generateMines(cell);
-            startTimer();
+          firstClick = false;
+          generateMines(cell);
+          startTimer();
         }
-
         cell.isRevealed = true;
         cell.element.classList.add('revealed');
-
         if (cell.isMine) {
-            endGame(false);
-            return;
+          endGame(false);
+          return;
         }
-
         if (cell.neighborMines > 0) {
-            cell.element.textContent = cell.neighborMines;
-            cell.element.classList.add(`c-${cell.neighborMines}`);
+          cell.element.textContent = cell.neighborMines;
+          cell.element.classList.add(`c-${cell.neighborMines}`);
         } else {
-            // Flood fill for empty spaces
-            for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                    const neighbor = grid[cell.r + dr]?.[cell.c + dc];
-                    if (neighbor) revealCell(neighbor);
-                }
+          // Flood fill for empty spaces
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const neighbor = grid[cell.r + dr]?.[cell.c + dc];
+              if (neighbor) revealCell(neighbor);
             }
+          }
         }
-
         checkWin();
-    }
+      }
 
-    function toggleFlag(cell) {
+      function toggleFlag(cell) {
         if (gameOver || cell.isRevealed) return;
-
         cell.isFlagged = !cell.isFlagged;
         cell.element.textContent = cell.isFlagged ? '🚩' : '';
         minesLeft += cell.isFlagged ? -1 : 1;
         mineCountEl.textContent = String(Math.max(0, minesLeft)).padStart(3, '0');
-    }
+      }
 
-    function checkWin() {
+      function checkWin() {
         let win = true;
         for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (!grid[r][c].isMine && !grid[r][c].isRevealed) win = false;
-            }
+          for (let c = 0; c < COLS; c++) {
+            if (!grid[r][c].isMine && !grid[r][c].isRevealed) win = false;
+          }
         }
         if (win) endGame(true);
-    }
+      }
 
-    function endGame(isWin) {
+      function endGame(isWin) {
         gameOver = true;
         clearInterval(timerInterval);
         resetBtn.textContent = isWin ? '😎' : '😵';
-
         // Reveal all mines
         for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (grid[r][c].isMine) {
-                    grid[r][c].element.classList.add('mine');
-                    grid[r][c].element.textContent = '💣';
-                }
+          for (let c = 0; c < COLS; c++) {
+            if (grid[r][c].isMine) {
+              grid[r][c].element.classList.add('mine');
+              grid[r][c].element.textContent = '💣';
             }
+          }
         }
-    }
+      }
+      resetBtn.addEventListener('click', initGame);
+      initGame();
+    </script>
+  </body>
 
-    resetBtn.addEventListener('click', initGame);
-    initGame();
-</script>
-</body>
 </html>
