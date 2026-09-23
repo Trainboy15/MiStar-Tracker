@@ -1766,6 +1766,11 @@
               <div class="about-row-desc" id="about-version"></div>
             </div>
 
+            <div class="about-row">
+              <div class="settings-row-label">Release Notes</div>
+              <div class="about-row-desc" id="about-note"></div>
+            </div>
+
             <!-- Row 2 -->
             <div class="about-row">
               <div class="settings-row-label">Created By:</div>
@@ -1833,12 +1838,14 @@
       </div>
     </div>
     <script>
-      const APP_VERSION = '0.8.2';
+      const APP_VERSION = '0.8.3';
       const APP_RELEASE_DATE = '2026-09-23';
+      const APP_NOTES = 'Copy changes'
       const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
       const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
       document.getElementById('about-version').textContent = APP_VERSION;
       document.getElementById('about-release-date').textContent = APP_RELEASE_DATE;
+      document.getElementById('about-note').textContent = APP_NOTEs
       const storageReadErrors = {};
 
       function readStoredJSON(key, fallback) {
