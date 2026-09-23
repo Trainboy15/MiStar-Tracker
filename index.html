@@ -1837,10 +1837,20 @@
         <button class="btn" onclick="closeBadGradesGamePopup()">Close</button>
       </div>
     </div>
+      <div id="feedback-popup" class="modal-backdrop" onlclick="closeFeedback()" aria-hidden="true">
+      <div class="modal-content " role="dialog" aria-modal="true">
+        <h3 id="game-modal-title">How is this app treating you?</h3>
+        <br>
+          <p>If you have a minute, please fill out this form!</p>
+          <p><kbd><a href="https://docs.google.com/forms/d/e/1FAIpQLSdQDsxDtCWE2qYktmK9cB_CMcxH3KFIREeNd7BdDesUNZxLyg/viewform?usp=dialog">Submit feedback.</a></kbd></p> 
+        <br>
+        <button class="btn" onclick="closeFeedback()">Close</button>
+      </div>
+    </div>
     <script>
-      const APP_VERSION = '0.8.4';
+      const APP_VERSION = '0.8.5';
       const APP_RELEASE_DATE = '2026-09-23';
-      const APP_NOTES = 'Change game grade thereshold'
+      const APP_NOTES = 'Add feedback popup'
       const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
       const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
       document.getElementById('about-version').textContent = APP_VERSION;
@@ -2710,6 +2720,19 @@
         }
         nav('grades')
       }
+      function openFeedback() {
+        const popup = document.getElementById('feedback-popup');
+        popup.style.display = 'flex';
+        popup.setAttribute('aria-hidden', 'false');
+      }
+      function closeFeedback() {
+        const popup = document.getElementById('feedback-popup');
+        if (popup) {
+          popup.style.display = 'none';
+          popup.setAttribute('aria-hidden', 'true');
+        }
+        nav('grades')
+      }
       // ── Settings ─────────────────────────────────────────────────
       const SETTING_DEFAULTS = {
         compactMode: false,
@@ -3114,6 +3137,12 @@
         checkReminderNotifications();
       }, 60000);
       checkReminderNotifications();
+      function askForFeedback() {
+        if ( localStorage.getItem('hasBeenShownFeedbackPopup') === "true" ) return; else
+        localStorage.setItem('hasBeenShownFeedbackPopup',true)
+        openFeedback()
+      }
+      askForFeedback()
     </script>
     <script>
       const ROWS = 10;
