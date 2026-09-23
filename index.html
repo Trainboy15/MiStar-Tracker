@@ -1687,6 +1687,21 @@
             </div>
             <div class="settings-row">
               <div>
+                <div class="settings-row-label">Reminder repeat</div>
+                <div class="settings-row-desc">Choose how long before notifications will repeat</div>
+              </div>
+              <div class="settings-row-right">
+                <select class="settings-select" id="setting-notificationRepeat" onchange="saveSetting('notificationRepeat', this.value)">
+                  <option value="0">Never</option>
+                  <option value="10">10 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div>
                 <div class="settings-row-label">Browser permission</div>
                 <div class="settings-row-desc" id="notifications-permission-state">Checking browser support…</div>
               </div>
@@ -1818,7 +1833,7 @@
       </div>
     </div>
     <script>
-      const APP_VERSION = '0.8.1';
+      const APP_VERSION = '0.8.2';
       const APP_RELEASE_DATE = '2026-09-23';
       const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
       const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
@@ -2730,6 +2745,12 @@
         applySettings();
         if (key === 'notificationLeadDays' || key === 'notificationsEnabled') {
           checkReminderNotifications();
+        }
+        if (key === 'notificationRepeat') {
+          setInterval(() => {
+          localStorage.removeItem('mst_notified_reminders');
+          checkReminderNotifications();
+      }, value);
         }
       }
 
