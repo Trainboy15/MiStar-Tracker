@@ -601,6 +601,17 @@
         position: relative;
         animation: fadeIn 0.2s ease-out;
       }
+      .modal-content .bu {
+        background-color: var(--bg4);
+        padding: 24px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        /* Adjust width as preferred */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        position: relative;
+        animation: fadeIn 0.2s ease-out;
+      }
 
       /* Close "X" Button */
       .modal-close {
@@ -1815,6 +1826,8 @@
       <div class="modal-content " role="dialog" aria-modal="true">
         <h3 id="game-modal-title">Play</h3>
         <br>
+
+        <br>
         <div class="minesweeper-container">
           <div class="minesweeper-header">
             <div id="mine-count" class="minesweeper-status">010</div>
@@ -1848,9 +1861,9 @@
       </div>
     </div>
     <script>
-      const APP_VERSION = '0.8.6';
+      const APP_VERSION = '0.8.7';
       const APP_RELEASE_DATE = '2026-09-24';
-      const APP_NOTES = 'Change feedback frequncy'
+      const APP_NOTES = 'Bug fixes'
       const UPDATE_MANIFEST_PATH = 'https://raw.githubusercontent.com/Trainboy15/MiStar-Tracker/refs/heads/main/version.json';
       const UPDATE_RECOVERY_KEY = 'mst_update_recovery';
       document.getElementById('about-version').textContent = APP_VERSION;
@@ -2690,7 +2703,6 @@
         openGamePopup();
         document.title = 'GradeBook | Rewards';
       }
-
       function closeBadGradesGamePopup() {
         const gamePopup = document.getElementById('bad-grades-popup');
         if (gamePopup) {
